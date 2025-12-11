@@ -103,16 +103,7 @@ export default function HomePage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {mounted && (
-            <div
-              className="profile-avatar"
-              style={{
-                background: `url(/profile/avatar.jpg)`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-          )}
+          
           <h1 className="profile-name">Moss Louvan</h1>
           <p className="profile-title">Software Engineer • Iowa State University</p>
         </motion.div>
@@ -144,19 +135,40 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="hero-title">
-            I&apos;m Moss, a full-ride Software Engineering student at Iowa State University and winner of NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI systems for enterprises and led a national-winning lunar exploration project.
-          </h1>
-          <p className="hero-subtitle">
-            Full-stack engineer specializing in AI systems, infrastructure, and developer tools. Based in Des Moines, IA.
-          </p>
-          <div className="hero-actions">
-            <a href="mailto:mosslouvan67@gmail.com" className="btn primary">
-              Get in Touch
-            </a>
-            <a href="https://www.linkedin.com/in/moss-louvan-4614682a4/" target="_blank" rel="noreferrer" className="btn ghost">
-              LinkedIn
-            </a>
+          <div className="hero-inner">
+            {/* left: tall avatar + centered subtitle */}
+            <div className="hero-left">
+              <div className="hero-avatar">
+                {/* IMPORTANT: public/profile/avatar.png => /profile/avatar.png */}
+                <img src="/profile/avatar.png" alt="Moss Louvan" />
+              </div>
+              <p className="hero-subtitle">
+                Full-stack engineer specializing in AI systems, infrastructure, and developer tools.
+                Based in Des Moines, IA.
+              </p>
+            </div>
+
+            {/* right: title + buttons */}
+            <div className="hero-copy">
+              <h1 className="hero-title">
+                I&apos;m Moss, a full-ride Software Engineering student at Iowa State University and
+                winner of NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI systems
+                for enterprises and led a national-winning lunar exploration project.
+              </h1>
+              <div className="hero-actions">
+                <a href="mailto:mosslouvan67@gmail.com" className="btn primary">
+                  Get in Touch
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/moss-louvan-4614682a4/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn ghost"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            </div>
           </div>
         </motion.section>
 
@@ -193,7 +205,8 @@ export default function HomePage() {
               <h3>Iowa State University</h3>
               <p className="card-subtitle">B.S. Software Engineering · Full-Ride Scholar</p>
               <p className="card-body">
-                Pursuing Software Engineering with a focus on AI systems, large-scale tooling, and developer productivity.
+                Pursuing Software Engineering with a focus on AI systems, large-scale tooling, and
+                developer productivity.
               </p>
             </div>
 
@@ -201,7 +214,8 @@ export default function HomePage() {
               <h3>Virtual Campus High School</h3>
               <p className="card-subtitle">Valedictorian · Rank 1/143</p>
               <p className="card-body">
-                Graduated as valedictorian while working as a contracted AI engineer and leading a national NASA project.
+                Graduated as valedictorian while working as a contracted AI engineer and leading a
+                national NASA project.
               </p>
             </div>
           </div>
@@ -214,8 +228,8 @@ export default function HomePage() {
               <h3>NASA South Pole Lunar Exploration App</h3>
               <p className="card-subtitle">Lead Coder & Game Developer · Oct 2023 – Apr 2024</p>
               <p className="card-body">
-                Led development of an AI-assisted lunar rover simulator built on real geospatial data of the Moon&apos;s south
-                pole to support Artemis mission training.
+                Led development of an AI-assisted lunar rover simulator built on real geospatial data
+                of the Moon&apos;s south pole to support Artemis mission training.
               </p>
               <ul className="card-list">
                 <li>Won the national 2024 NASA App Development Challenge</li>
@@ -255,23 +269,24 @@ export default function HomePage() {
             <div className="card">
               <h3>Team Lead · NASA ADC Winners</h3>
               <p className="card-body">
-                Led a small, focused team to a national win in a NASA competition with over a hundred participating teams.
+                Led a small, focused team to a national win in a NASA competition with over a hundred
+                participating teams.
               </p>
             </div>
 
             <div className="card">
               <h3>Speaker & Presenter</h3>
               <p className="card-body">
-                Delivered talks for the Technology Association of Iowa and other organizations, translating complex systems
-                into clear language.
+                Delivered talks for the Technology Association of Iowa and other organizations,
+                translating complex systems into clear language.
               </p>
             </div>
 
             <div className="card">
               <h3>Mentor & STEM Advocate</h3>
               <p className="card-body">
-                Taught Python and problem-solving to elementary students and served as a panelist at a national STEM
-                conference in Washington, D.C.
+                Taught Python and problem-solving to elementary students and served as a panelist at a
+                national STEM conference in Washington, D.C.
               </p>
             </div>
           </div>
@@ -320,8 +335,7 @@ export default function HomePage() {
         <footer className="footer">
           <p>© {new Date().getFullYear()} Moss Louvan. All rights reserved.</p>
           <p>
-            Contact:{" "}
-            <a href="mailto:mosslouvan67@gmail.com">mosslouvan67@gmail.com</a> ·{" "}
+            Contact: <a href="mailto:mosslouvan67@gmail.com">mosslouvan67@gmail.com</a> ·{" "}
             <a href="tel:+15158039201">(515) 803-9201</a>
           </p>
         </footer>

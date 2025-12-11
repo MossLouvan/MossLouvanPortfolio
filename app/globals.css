@@ -63,11 +63,7 @@ body {
 .profile-card {
   display: flex;
   align-items: center;
-  gap: 0;
-}
-
-.profile-avatar {
-  display: none;
+  gap: 0.75rem;
 }
 
 .profile-name {
@@ -118,24 +114,65 @@ body {
   opacity: 0.6;
 }
 
-/* Hero Section */
+/* =========================
+   Hero Section
+   ========================= */
+
 .hero-banner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
   padding: 6rem 4rem;
   margin-top: 80px;
   max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  animation: none;
+  min-height: calc(100vh - 80px); /* fill most of the screen */
+  display: flex;
+  align-items: center;
 }
 
+.hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr); /* left image, right text */
+  gap: 3.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+/* left column: tall avatar + subtitle, centered */
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hero-avatar {
+  width: 100%;
+  max-width: 420px;     
+  height: auto;         
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+  background: var(--border);
+}
+
+.hero-avatar img {
+  width: 100%;
+  height: auto;         
+  object-fit: contain;  
+  display: block;
+}
+
+
+/* right column: title + buttons */
+.hero-copy {
+  max-width: 750px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* title block – visually similar height to image */
 .hero-title {
   font-size: 3.5rem;
   font-weight: 300;
@@ -148,11 +185,14 @@ body {
   font-weight: 400;
 }
 
+/* subtitle centered under picture */
 .hero-subtitle {
   font-size: 1.1rem;
   color: var(--muted);
-  margin: 1rem 0;
+  margin: 0;
   line-height: 1.7;
+  text-align: center;
+  max-width: 26rem;
 }
 
 .hero-actions {
@@ -161,6 +201,7 @@ body {
   margin-top: 2rem;
 }
 
+/* Buttons */
 .btn {
   padding: 0.75rem 2rem;
   border: 1px solid var(--fg);
@@ -196,27 +237,10 @@ body {
   border: 1px solid var(--border);
 }
 
-/* Profile Image */
-.hero-banner::before {
-  content: '';
-}
+/* =========================
+   Sections
+   ========================= */
 
-.hero-banner > div:first-child {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 3/4;
-  background: linear-gradient(135deg, #000000, #333333);
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.hero-banner > div:first-child img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Sections */
 .collapsible-section {
   border-top: 1px solid var(--border);
   padding: 4rem 4rem;
@@ -452,10 +476,14 @@ body {
   }
 
   .hero-banner {
-    grid-template-columns: 1fr;
     padding: 3rem 2rem;
-    gap: 2rem;
     margin-top: 140px;
+    min-height: auto;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
   .hero-title {
