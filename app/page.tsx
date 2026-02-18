@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 
+/* ─── Theme Toggle ─────────────────────────────────────────── */
 function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Only run on client
     setMounted(true);
     const stored = window.localStorage.getItem("theme");
     const initial = stored === "light" || stored === "dark" ? stored : "dark";
@@ -26,12 +26,19 @@ function ThemeToggle() {
   };
 
   return (
-    <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+    <motion.button
+      className="theme-toggle"
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
       {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
-    </button>
+    </motion.button>
   );
 }
 
+/* ─── Collapsible Section ───────────────────────────────────── */
 function CollapsibleSection({
   title,
   children,
@@ -49,53 +56,119 @@ function CollapsibleSection({
     <motion.div
       id={id}
       className="collapsible-section"
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.4 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <div className="section-header" onClick={() => setOpen(!open)}>
+      <motion.div
+        className="section-header"
+        onClick={() => setOpen(!open)}
+        whileHover={{ opacity: 0.8 }}
+        transition={{ duration: 0.15 }}
+      >
         <h2 className="section-title">{title}</h2>
-        <span className={`section-toggle ${open ? "open" : ""}`}>▼</span>
-      </div>
-      {open && <div className={`section-content ${open ? "open" : ""}`}>{children}</div>}
+        <motion.span
+          className="section-toggle"
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          ▼
+        </motion.span>
+      </motion.div>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            className="section-content open"
+            initial={{ opacity: 0, height: 0, y: -8 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            style={{ overflow: "hidden" }}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: open ? 0.1 : 0 }}
+            >
+              {children}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
-const sectionVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0 },
-};
+/* ─── Staggered Chips ───────────────────────────────────────── */
+function ChipGroup({ chips }: { chips: string[] }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
 
+  return (
+    <div ref={ref} className="chips">
+      {chips.map((chip, i) => (
+        <motion.span
+          key={chip}
+          className="chip"
+          initial={{ opacity: 0, y: 10, scale: 0.92 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.92 }}
+          transition={{ duration: 0.3, delay: i * 0.06, ease: "easeOut" }}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.96 }}
+        >
+          {chip}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Card ──────────────────────────────────────────────────── */
+function AnimatedCard({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      className="card"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.4, delay, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ─── Page ──────────────────────────────────────────────────── */
 export default function HomePage() {
-  // gallery state: images read from public/achievements via API
   const [images, setImages] = useState<string[]>([]);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
     async function loadImages() {
       try {
         const res = await fetch("/api/achievements");
-        if (!res.ok) {
-          console.error("Failed to fetch achievements:", res.statusText);
-          return;
-        }
+        if (!res.ok) return;
         const data = await res.json();
         setImages(data.images || []);
       } catch (e) {
         console.error("Failed to load achievement images:", e);
       }
     }
-
     loadImages();
   }, []);
 
   return (
     <div className="page-root">
-      {/* Sidebar */}
+      {/* ── Nav ──────────────────────────────────────────────── */}
       <aside className="sidebar">
         <motion.div
           className="profile-card"
@@ -103,79 +176,112 @@ export default function HomePage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          
           <h1 className="profile-name">Moss Louvan</h1>
-          <p className="profile-title">Software Engineer • Iowa State University</p>
+          <p className="profile-title">Software Engineer · Iowa State University</p>
         </motion.div>
 
         <motion.nav
           className="sidebar-nav"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <a href="#about">About</a>
-          <a href="#experience">Experience</a>
-          <a href="#projects">Projects</a>
-          <a href="#achievements">Achievements</a>
-          <a href="#leadership">Leadership</a>
-          <a href="#skills">Skills</a>
+          {["About", "Experience", "Projects", "Achievements", "Leadership", "Skills"].map(
+            (label, i) => (
+              <motion.a
+                key={label}
+                href={`#${label.toLowerCase()}`}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 + i * 0.06 }}
+                whileHover={{ opacity: 0.55 }}
+              >
+                {label}
+              </motion.a>
+            )
+          )}
         </motion.nav>
 
         <ThemeToggle />
       </aside>
 
-      {/* Main Content */}
+      {/* ── Main ─────────────────────────────────────────────── */}
       <main className="main">
-        {/* Hero Banner */}
+        {/* Hero */}
         <motion.section
           id="about"
           className="hero-banner"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
         >
           <div className="hero-inner">
-            {/* left: tall avatar + centered subtitle */}
+            {/* Left: avatar + subtitle */}
             <div className="hero-left">
-              <div className="hero-avatar">
-                {/* IMPORTANT: public/profile/avatar.png => /profile/avatar.png */}
+              <motion.div
+                className="hero-avatar"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+              >
                 <img src="/profile/avatar.png" alt="Moss Louvan" />
-              </div>
-              <p className="hero-subtitle">
+              </motion.div>
+              <motion.p
+                className="hero-subtitle"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.45 }}
+              >
                 Full-stack engineer specializing in AI systems, infrastructure, and developer tools.
                 Based in Des Moines, IA.
-              </p>
+              </motion.p>
             </div>
 
-            {/* right: title + buttons */}
+            {/* Right: heading + CTA */}
             <div className="hero-copy">
-              <h1 className="hero-title">
+              <motion.h1
+                className="hero-title"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
+              >
                 I&apos;m Moss, a full-ride Software Engineering student at Iowa State University and
                 winner of NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI systems
                 for enterprises and led a national-winning lunar exploration project.
-              </h1>
-              <div className="hero-actions">
-                <a href="mailto:mosslouvan67@gmail.com" className="btn primary">
+              </motion.h1>
+              <motion.div
+                className="hero-actions"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.55 }}
+              >
+                <motion.a
+                  href="mailto:mosslouvan67@gmail.com"
+                  className="btn primary"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
                   Get in Touch
-                </a>
-                <a
+                </motion.a>
+                <motion.a
                   href="https://www.linkedin.com/in/moss-louvan-4614682a4/"
                   target="_blank"
                   rel="noreferrer"
                   className="btn ghost"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                 >
                   LinkedIn
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
             </div>
           </div>
         </motion.section>
 
-        {/* Experience */}
-        <CollapsibleSection title="Experience" defaultOpen={true}>
-          <div className="cards-grid" id="experience">
-            <div className="card">
+        {/* ── Experience ───────────────────────────────────── */}
+        <CollapsibleSection title="Experience" defaultOpen={true} id="experience">
+          <div className="cards-grid">
+            <AnimatedCard delay={0}>
               <h3>Contracted AI Software Engineer</h3>
               <p className="card-subtitle">Principal Financial Group · Jun 2024 – Aug 2024</p>
               <ul className="card-list">
@@ -184,9 +290,9 @@ export default function HomePage() {
                 <li>Implemented RAG with transparent chunk highlighting for traceability</li>
                 <li>Demoed to senior engineers, executives, and CEO Dan Houston</li>
               </ul>
-            </div>
+            </AnimatedCard>
 
-            <div className="card">
+            <AnimatedCard delay={0.1}>
               <h3>Software Engineering Intern (Incoming 2026)</h3>
               <p className="card-subtitle">John Deere Headquarters · May 2026 – Jul 2026</p>
               <ul className="card-list">
@@ -194,37 +300,37 @@ export default function HomePage() {
                 <li>Migrating LangGraph workflows onto Google&apos;s A2A framework</li>
                 <li>Designing high-speed retrieval paths with Postgres and vector search</li>
               </ul>
-            </div>
+            </AnimatedCard>
           </div>
         </CollapsibleSection>
 
-        {/* Education */}
-        <CollapsibleSection title="Education" defaultOpen={false}>
-          <div className="cards-grid" id="about">
-            <div className="card">
+        {/* ── Education ────────────────────────────────────── */}
+        <CollapsibleSection title="Education" defaultOpen={false} id="education">
+          <div className="cards-grid">
+            <AnimatedCard delay={0}>
               <h3>Iowa State University</h3>
               <p className="card-subtitle">B.S. Software Engineering · Full-Ride Scholar</p>
               <p className="card-body">
                 Pursuing Software Engineering with a focus on AI systems, large-scale tooling, and
                 developer productivity.
               </p>
-            </div>
+            </AnimatedCard>
 
-            <div className="card">
+            <AnimatedCard delay={0.1}>
               <h3>Virtual Campus High School</h3>
               <p className="card-subtitle">Valedictorian · Rank 1/143</p>
               <p className="card-body">
                 Graduated as valedictorian while working as a contracted AI engineer and leading a
                 national NASA project.
               </p>
-            </div>
+            </AnimatedCard>
           </div>
         </CollapsibleSection>
 
-        {/* Projects */}
-        <CollapsibleSection title="Projects" defaultOpen={true}>
-          <div className="cards-grid" id="projects">
-            <div className="card">
+        {/* ── Projects ─────────────────────────────────────── */}
+        <CollapsibleSection title="Projects" defaultOpen={true} id="projects">
+          <div className="cards-grid">
+            <AnimatedCard>
               <h3>NASA South Pole Lunar Exploration App</h3>
               <p className="card-subtitle">Lead Coder & Game Developer · Oct 2023 – Apr 2024</p>
               <p className="card-body">
@@ -236,24 +342,25 @@ export default function HomePage() {
                 <li>Reached global audience through interviews and podcasts</li>
                 <li>Recognized by Iowa state leadership as a STEM advocate</li>
               </ul>
-            </div>
+            </AnimatedCard>
           </div>
         </CollapsibleSection>
 
-        {/* Achievements Gallery */}
-        <CollapsibleSection title="Achievements & Awards" defaultOpen={true}>
+        {/* ── Achievements Gallery ─────────────────────────── */}
+        <CollapsibleSection title="Achievements & Awards" defaultOpen={true} id="achievements">
           {images.length === 0 ? (
             <p className="card-body">No images found. Add picture files to /public/achievements folder.</p>
           ) : (
-            <div className="gallery-grid" id="achievements">
-              {images.map((src) => (
+            <div className="gallery-grid">
+              {images.map((src, i) => (
                 <motion.figure
                   key={src}
                   className="gallery-item"
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.85 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.35, delay: i * 0.07 }}
+                  whileHover={{ scale: 1.05 }}
                 >
                   <img src={src} alt={src.split("/").pop()} />
                   <figcaption>{src.split("/").pop()}</figcaption>
@@ -263,75 +370,56 @@ export default function HomePage() {
           )}
         </CollapsibleSection>
 
-        {/* Leadership & Outreach */}
+        {/* ── Leadership ───────────────────────────────────── */}
         <CollapsibleSection title="Leadership & Outreach" defaultOpen={false} id="leadership">
           <div className="cards-grid">
-            <div className="card">
+            <AnimatedCard delay={0}>
               <h3>Team Lead · NASA ADC Winners</h3>
               <p className="card-body">
                 Led a small, focused team to a national win in a NASA competition with over a hundred
                 participating teams.
               </p>
-            </div>
+            </AnimatedCard>
 
-            <div className="card">
+            <AnimatedCard delay={0.08}>
               <h3>Speaker & Presenter</h3>
               <p className="card-body">
                 Delivered talks for the Technology Association of Iowa and other organizations,
                 translating complex systems into clear language.
               </p>
-            </div>
+            </AnimatedCard>
 
-            <div className="card">
+            <AnimatedCard delay={0.16}>
               <h3>Mentor & STEM Advocate</h3>
               <p className="card-body">
                 Taught Python and problem-solving to elementary students and served as a panelist at a
                 national STEM conference in Washington, D.C.
               </p>
-            </div>
+            </AnimatedCard>
           </div>
         </CollapsibleSection>
 
-        {/* Skills */}
+        {/* ── Skills ───────────────────────────────────────── */}
         <CollapsibleSection title="Technical Stack" defaultOpen={false} id="skills">
           <div className="skills-grid">
             <div className="skills-category">
               <h3 className="skills-title">Languages & Core</h3>
-              <div className="chips">
-                <span className="chip">Python</span>
-                <span className="chip">Java</span>
-                <span className="chip">C / C++</span>
-                <span className="chip">C#</span>
-                <span className="chip">SQL</span>
-                <span className="chip">TypeScript</span>
-              </div>
+              <ChipGroup chips={["Python", "Java", "C / C++", "C#", "SQL", "TypeScript"]} />
             </div>
 
             <div className="skills-category">
               <h3 className="skills-title">AI & Tooling</h3>
-              <div className="chips">
-                <span className="chip">LangChain</span>
-                <span className="chip">LangGraph</span>
-                <span className="chip">A2A</span>
-                <span className="chip">AWS Bedrock</span>
-                <span className="chip">OpenAI</span>
-              </div>
+              <ChipGroup chips={["LangChain", "LangGraph", "A2A", "AWS Bedrock", "OpenAI"]} />
             </div>
 
             <div className="skills-category">
               <h3 className="skills-title">Infrastructure & Web</h3>
-              <div className="chips">
-                <span className="chip">Postgres</span>
-                <span className="chip">Docker</span>
-                <span className="chip">Kubernetes</span>
-                <span className="chip">Next.js</span>
-                <span className="chip">React</span>
-              </div>
+              <ChipGroup chips={["Postgres", "Docker", "Kubernetes", "Next.js", "React"]} />
             </div>
           </div>
         </CollapsibleSection>
 
-        {/* Footer */}
+        {/* ── Footer ───────────────────────────────────────── */}
         <footer className="footer">
           <p>© {new Date().getFullYear()} Moss Louvan. All rights reserved.</p>
           <p>
