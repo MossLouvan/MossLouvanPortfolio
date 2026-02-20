@@ -5,13 +5,13 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 
 /* ─── Captions for Achievements Lightbox ───────────────────── */
 const ACHIEVEMENT_CAPTIONS: Record<string, string> = {
-  "Me presenting at the Houston Space Center.jpg":
+  "me-presenting-houston-space-center.jpg":
     "Presenting at the Houston Space Center as part of my NASA App Development Challenge journey.",
-  "Me presenting at the Johnston Space Center to NASA employees.jpg":
+  "me-presenting-johnston-space-center-nasa.jpg":
     "Sharing our work with NASA employees at Johnson Space Center.",
-  "Me presenting at the Technology Assosiation of Iowa.jpg":
+  "me-presenting-technology-association-of-iowa.jpg":
     "Speaking at the Technology Association of Iowa about building real-world software + AI systems.",
-  "My meeting with the CEO of Principal Financial Group Dan Houston.jpg":
+  "meeting-principal-ceo-dan-houston.jpg":
     "Meeting Principal Financial Group CEO Dan Houston after demonstrating the AI platform I built.",
 };
 
