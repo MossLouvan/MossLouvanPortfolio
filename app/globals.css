@@ -44,7 +44,7 @@ body {
   flex: 1;
 }
 
-/* â”€â”€â”€ Header Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Header Navigation ───────────────────────────────────── */
 .sidebar {
   position: fixed;
   top: 0;
@@ -58,7 +58,6 @@ body {
   align-items: center;
   z-index: 100;
   height: auto;
-  /* Subtle backdrop blur for polish */
   backdrop-filter: blur(8px);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
 }
@@ -95,7 +94,7 @@ body {
   background: transparent;
   padding: 0;
   border-radius: 0;
-  display: inline-block; /* needed for framer-motion whileHover */
+  display: inline-block;
 }
 
 .theme-toggle {
@@ -110,7 +109,7 @@ body {
   transition: opacity 0.2s ease;
 }
 
-/* â”€â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Hero ────────────────────────────────────────────────── */
 .hero-banner {
   padding: 6rem 4rem;
   margin-top: 80px;
@@ -189,7 +188,7 @@ body {
   margin-top: 2rem;
 }
 
-/* â”€â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Buttons ─────────────────────────────────────────────── */
 .btn {
   padding: 0.75rem 2rem;
   border: 1px solid var(--fg);
@@ -225,7 +224,7 @@ body {
   border: 1px solid var(--border);
 }
 
-/* â”€â”€â”€ Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Sections ────────────────────────────────────────────── */
 .collapsible-section {
   border-top: 1px solid var(--border);
   padding: 4rem 4rem;
@@ -253,7 +252,6 @@ body {
   color: var(--fg);
 }
 
-/* The toggle icon is now animated by framer-motion â€“ no CSS transform needed */
 .section-toggle {
   width: 24px;
   height: 24px;
@@ -262,14 +260,11 @@ body {
   justify-content: center;
   color: var(--fg);
   font-size: 1.2rem;
-  /* Remove old CSS transition â€“ framer-motion handles rotation */
   flex-shrink: 0;
-  margin-bottom: 2rem; /* align with section-title bottom margin */
+  margin-bottom: 2rem;
 }
 
-
-
-/* â”€â”€â”€ Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Cards ───────────────────────────────────────────────── */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -312,7 +307,7 @@ body {
   margin-bottom: 0.5rem;
 }
 
-/* â”€â”€â”€ Gallery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Gallery ─────────────────────────────────────────────── */
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -320,28 +315,41 @@ body {
   margin-top: 2rem;
 }
 
+/* the card (square) */
 .gallery-item {
   aspect-ratio: 1;
   background: var(--border);
   border-radius: 0.5rem;
-  overflow: hidden;
+  overflow: hidden; /* important: clips the image */
   cursor: pointer;
   border: none;
   margin: 0;
 }
 
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* button wrapper */
+.gallery-btn {
+  all: unset;
   display: block;
+  width: 100%;
+  height: 100%; /* important: fill the square */
+  cursor: pointer;
 }
 
+/* image must fill the square (fixes grey bar) */
+.gallery-btn img {
+  width: 100%;
+  height: 100%; /* important */
+  object-fit: cover;
+  display: block;
+  border-radius: 0; /* parent handles rounding */
+}
+
+/* you’re not showing these on the card view */
 .gallery-item figcaption {
   display: none;
 }
 
-/* â”€â”€â”€ Skills / Chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Skills / Chips ──────────────────────────────────────── */
 .skills-grid {
   display: grid;
   gap: 2rem;
@@ -375,7 +383,6 @@ body {
   color: var(--fg);
   border-radius: 2rem;
   cursor: default;
-  /* Color transition for hover â€“ framer-motion handles scale */
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   display: inline-block;
 }
@@ -386,7 +393,7 @@ body {
   color: var(--bg);
 }
 
-/* â”€â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Footer ──────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid var(--border);
   padding: 3rem 4rem;
@@ -408,7 +415,89 @@ body {
   opacity: 0.6;
 }
 
-/* â”€â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Lightbox ────────────────────────────────────────────── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.lightbox-content {
+  position: relative;
+  width: min(1100px, 96vw);
+  max-height: 92vh;
+  background: rgba(18, 18, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+}
+
+.lightbox-img {
+  width: 100%;
+  height: min(72vh, 780px);
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.25);
+  display: block;
+}
+
+.lightbox-caption {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.lightbox-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lightbox-text {
+  opacity: 0.85;
+  line-height: 1.35;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 26px;
+  display: grid;
+  place-items: center;
+}
+
+.lightbox-nav.left {
+  left: 10px;
+}
+.lightbox-nav.right {
+  right: 10px;
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar {
     padding: 1.5rem 2rem;

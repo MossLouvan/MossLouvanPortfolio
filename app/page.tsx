@@ -3,6 +3,18 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 
+/* ─── Captions for Achievements Lightbox ───────────────────── */
+const ACHIEVEMENT_CAPTIONS: Record<string, string> = {
+  "Me presenting at the Houston Space Center.jpg":
+    "Presenting at the Houston Space Center as part of my NASA App Development Challenge journey.",
+  "Me presenting at the Johnston Space Center to NASA employees.jpg":
+    "Sharing our work with NASA employees at Johnson Space Center.",
+  "Me presenting at the Technology Assosiation of Iowa.jpg":
+    "Speaking at the Technology Association of Iowa about building real-world software + AI systems.",
+  "My meeting with the CEO of Principal Financial Group Dan Houston.jpg":
+    "Meeting Principal Financial Group CEO Dan Houston after demonstrating the AI platform I built.",
+};
+
 /* ─── Theme Toggle ─────────────────────────────────────────── */
 function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
@@ -115,7 +127,9 @@ function ChipGroup({ chips }: { chips: string[] }) {
           key={chip}
           className="chip"
           initial={{ opacity: 0, y: 10, scale: 0.92 }}
-          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.92 }}
+          animate={
+            isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.92 }
+          }
           transition={{ duration: 0.3, delay: i * 0.06, ease: "easeOut" }}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
@@ -152,6 +166,21 @@ function AnimatedCard({
 export default function HomePage() {
   const [images, setImages] = useState<string[]>([]);
 
+  // Lightbox
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  const openLightbox = (index: number) => {
+    setActiveIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setLightboxOpen(false);
+
+  const goNext = () => setActiveIndex((i) => (images.length ? (i + 1) % images.length : 0));
+  const goPrev = () =>
+    setActiveIndex((i) => (images.length ? (i - 1 + images.length) % images.length : 0));
+
   useEffect(() => {
     async function loadImages() {
       try {
@@ -165,6 +194,20 @@ export default function HomePage() {
     }
     loadImages();
   }, []);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxOpen, images.length]);
 
   return (
     <div className="page-root">
@@ -246,8 +289,7 @@ export default function HomePage() {
                 transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
               >
                 I&apos;m Moss, a full-ride Software Engineering student at Iowa State University and
-                winner of NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI systems
-                for enterprises and led a national-winning lunar exploration project.
+                winner of NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI applications for fortune 500 companies and led a national winning lunar exploration project.
               </motion.h1>
               <motion.div
                 className="hero-actions"
@@ -351,22 +393,85 @@ export default function HomePage() {
           {images.length === 0 ? (
             <p className="card-body">No images found. Add picture files to /public/achievements folder.</p>
           ) : (
-            <div className="gallery-grid">
-              {images.map((src, i) => (
-                <motion.figure
-                  key={src}
-                  className="gallery-item"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: i * 0.07 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img src={src} alt={src.split("/").pop()} />
-                  <figcaption>{src.split("/").pop()}</figcaption>
-                </motion.figure>
-              ))}
-            </div>
+            <>
+              <div className="gallery-grid">
+                {images.map((src, i) => {
+                  const filename = decodeURIComponent(src.split("/").pop() || "");
+                  const caption = ACHIEVEMENT_CAPTIONS[filename] ?? "Achievement photo.";
+
+                  return (
+                    <motion.figure
+                      key={src}
+                      className="gallery-item"
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.35, delay: i * 0.07 }}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => openLightbox(i)}
+                        className="gallery-btn"
+                        aria-label={`Open image: ${filename}`}
+                      >
+                        <img src={src} alt={caption} />
+                      </button>
+                      <figcaption>{filename}</figcaption>
+                    </motion.figure>
+                  );
+                })}
+              </div>
+
+              {/* Lightbox Modal */}
+              <AnimatePresence>
+                {lightboxOpen && images[activeIndex] && (() => {
+                  const src = images[activeIndex];
+                  const filename = decodeURIComponent(src.split("/").pop() || "");
+                  const caption = ACHIEVEMENT_CAPTIONS[filename] ?? "Achievement photo.";
+
+                  return (
+                    <motion.div
+                      className="lightbox-overlay"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={closeLightbox}
+                      role="dialog"
+                      aria-modal="true"
+                      aria-label="Image viewer"
+                    >
+                      <motion.div
+                        className="lightbox-content"
+                        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                        transition={{ duration: 0.18 }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button className="lightbox-close" onClick={closeLightbox} aria-label="Close">
+                          ✕
+                        </button>
+
+                        <button className="lightbox-nav left" onClick={goPrev} aria-label="Previous image">
+                          ‹
+                        </button>
+                        <button className="lightbox-nav right" onClick={goNext} aria-label="Next image">
+                          ›
+                        </button>
+
+                        <img className="lightbox-img" src={src} alt={caption} />
+
+                        <div className="lightbox-caption">
+                          <div className="lightbox-title">{filename}</div>
+                          <div className="lightbox-text">{caption}</div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </>
           )}
         </CollapsibleSection>
 
