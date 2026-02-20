@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
-
+export const runtime = 'edge';
 export async function GET() {
   const dir = path.join(process.cwd(), 'public', 'achievements');
   let files: string[] = [];

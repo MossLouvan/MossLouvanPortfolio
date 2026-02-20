@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-
+export const runtime = 'edge';
 const PROFILE_IMAGE_DIR = path.join(process.cwd(), 'public', 'profile');
 const PROFILE_IMAGE_PATH = path.join(PROFILE_IMAGE_DIR, 'avatar.jpg');
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
