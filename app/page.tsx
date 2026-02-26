@@ -52,6 +52,12 @@ export default function HomePage() {
     setCsOpen(false);
   }, []);
 
+  // helper for buttons
+  const viewCaseStudy = useCallback(
+    (slug: string) => () => openCaseStudy(slug),
+    [openCaseStudy]
+  );
+
   useEffect(() => {
     async function loadImages() {
       try {
@@ -139,7 +145,7 @@ export default function HomePage() {
             ))}
           </motion.nav>
 
-          {/* RIGHT SIDE controls: expanding search + theme toggle */}
+          {/* RIGHT SIDE controls: search + theme toggle */}
           <div className="header-right" style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <CommandPalette commands={COMMANDS} />
             <ThemeToggle />
@@ -271,17 +277,51 @@ export default function HomePage() {
           <CollapsibleSection title="Projects" defaultOpen id="projects">
             <div className="cards-grid">
               <AnimatedCard>
+                <h3>AI PDF Processing Platform</h3>
+                <p className="card-subtitle">
+                  Contracted AI Software Engineer · Principal Financial Group · Jun 2024 – Aug 2024
+                </p>
+
+                <p className="card-body">
+                  Built an end-to-end AI platform to ingest PDFs, chunk + embed content, and power traceable RAG with
+                  evidence highlighting.
+                </p>
+
+                <ul className="card-list">
+                  <li>RAG pipeline with transparent chunk highlighting</li>
+                  <li>AWS Bedrock (Titan Text + Embeddings) + vector storage</li>
+                  <li>Shipped for stakeholders and demoed to leadership</li>
+                </ul>
+
+                <div style={{ marginTop: 14 }}>
+                  
+                  <button className="btn ghost" onClick={viewCaseStudy("principal-ai-pdf")}>
+                    View case study →
+                  </button>
+                </div>
+              </AnimatedCard>
+
+              <AnimatedCard delay={0.1}>
                 <h3>NASA South Pole Lunar Exploration App</h3>
                 <p className="card-subtitle">Lead Coder & Game Developer · Oct 2023 – Apr 2024</p>
+
                 <p className="card-body">
-                  Led development of an AI-assisted lunar rover simulator built on real geospatial data of the
-                  Moon&apos;s south pole to support Artemis mission training.
+                  Led development of an AI-assisted lunar rover simulator using real lunar south pole terrain
+                  constraints and mission-oriented exploration workflows.
                 </p>
+
                 <ul className="card-list">
-                  <li>Won the national 2024 NASA App Development Challenge</li>
-                  <li>Reached global audience through interviews and podcasts</li>
-                  <li>Recognized by Iowa state leadership as a STEM advocate</li>
+                  <li>National winner — NASA App Development Challenge</li>
+                  <li>Interactive exploration / simulation experience</li>
+                  <li>Designed for storytelling + demo mode stability</li>
                 </ul>
+
+                <div style={{ marginTop: 14 }}>
+                  
+                  <button className="btn ghost" onClick={viewCaseStudy("nasa-adc")}>
+                    View case study →
+                  </button>
+                </div>
               </AnimatedCard>
             </div>
           </CollapsibleSection>
