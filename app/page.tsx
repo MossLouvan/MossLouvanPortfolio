@@ -8,6 +8,7 @@ import CollapsibleSection from "@/components/CollapsibleSection";
 import ChipGroup from "@/components/ChipGroup";
 import AnimatedCard from "@/components/AnimatedCard";
 import AchievementsGallery from "@/components/AchievementsGallery";
+import Typewriter from "@/components/Typewriter";
 
 import CommandPalette, { CommandItem } from "@/components/CommandPalette";
 import CaseStudyDrawer from "@/components/CaseStudyDrawer";
@@ -16,6 +17,7 @@ import type { CaseStudy } from "@/data/caseStudies";
 
 export default function HomePage() {
   const [images, setImages] = useState<string[]>([]);
+  const [heroTypingDone, setHeroTypingDone] = useState(false);
 
   // Achievements lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -175,8 +177,8 @@ export default function HomePage() {
                 <motion.p
                   className="hero-subtitle"
                   initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.45 }}
+                  animate={heroTypingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                  transition={{ duration: 0.5 }}
                 >
                   Full-stack engineer specializing in AI systems, infrastructure, and developer tools. Based in Des
                   Moines, IA.
@@ -184,22 +186,26 @@ export default function HomePage() {
               </div>
 
               <div className="hero-copy">
-                <motion.h1
+                <Typewriter
+                  text="Hey, I'm Moss! I'm a full-ride Software Engineering student at Iowa State University and a national winner of NASA's 2024 App Development Challenge. I've built AI systems for Fortune 500 companies and led a winning lunar exploration project."
+                  highlights={[
+                    "full-ride Software Engineering student",
+                    "NASA's 2024 App Development Challenge",
+                    "AI systems",
+                    "Fortune 500"
+                    
+                  ]}
+                  speed={30}
+                  initialDelay={800}
+                  onComplete={() => setHeroTypingDone(true)}
                   className="hero-title"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
-                >
-                  I&apos;m Moss, a full-ride Software Engineering student at Iowa State University and winner of
-                  NASA&apos;s 2024 App Development Challenge. I&apos;ve shipped AI applications for fortune 500
-                  companies and led a national winning lunar exploration project.
-                </motion.h1>
+                />
 
                 <motion.div
                   className="hero-actions"
                   initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.55 }}
+                  animate={heroTypingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+                  transition={{ duration: 0.5 }}
                 >
                   <motion.a
                     href="mailto:mosslouvan67@gmail.com"

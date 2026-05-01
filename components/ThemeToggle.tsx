@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [wipe, setWipe] = useState<{ key: number; toLight: boolean } | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -19,6 +21,8 @@ export default function ThemeToggle() {
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
+    setWipe({ key: Date.now(), toLight: next === "light" });
+
     setTheme(next);
     document.documentElement.classList.toggle("dark", next === "dark");
     window.localStorage.setItem("theme", next);
@@ -28,11 +32,35 @@ export default function ThemeToggle() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, marginTop: 8 }}>
+    {/* Slide wipe overlay */}
+    <AnimatePresence>
+      {wipe && (
+        <motion.div
+          key={wipe.key}
+          initial={{ x: wipe.toLight ? "-100%" : "100%" }}
+          animate={{ x: "0%" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+          onAnimationComplete={() => setWipe(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: wipe.toLight
+              ? "rgba(255,255,255,0.12)"
+              : "rgba(0,0,0,0.12)",
+            pointerEvents: "none",
+            zIndex: 9999,
+          }}
+        />
+      )}
+    </AnimatePresence>
+
     <motion.button
+      ref={btnRef}
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
-      whileTap={{ scale: 0.94 }}
+      whileTap={{ scale: 0.94, rotate: isDark ? 15 : -15 }}
       style={{
         position: "relative",
         display: "inline-flex",
