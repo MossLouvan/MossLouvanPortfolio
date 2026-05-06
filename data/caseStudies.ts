@@ -75,7 +75,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "principal-ai-pdf",
     title: "AI PDF Processing Platform",
-    subtitle: "Contracted AI Software Engineer — Principal Financial Group",
+    subtitle: "Contracted AI Software Engineer · Principal Financial Group",
     timeframe: "Jun 2024 – Aug 2024",
     links: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" },

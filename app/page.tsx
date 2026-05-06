@@ -9,6 +9,7 @@ import ChipGroup from "@/components/ChipGroup";
 import AnimatedCard from "@/components/AnimatedCard";
 import AchievementsGallery from "@/components/AchievementsGallery";
 import Typewriter from "@/components/Typewriter";
+import ExperienceTimeline from "@/components/ExperienceTimeline";
 
 import CommandPalette, { CommandItem } from "@/components/CommandPalette";
 import CaseStudyDrawer from "@/components/CaseStudyDrawer";
@@ -232,28 +233,7 @@ export default function HomePage() {
 
           {/* Experience */}
           <CollapsibleSection title="Experience" defaultOpen id="experience">
-            <div className="cards-grid">
-              <AnimatedCard>
-                <h3>Contracted AI Software Engineer</h3>
-                <p className="card-subtitle">Principal Financial Group · Jun 2024 – Aug 2024</p>
-                <ul className="card-list">
-                  <li>Selected as the first high school engineer to join Principal&apos;s software teams</li>
-                  <li>Built a full-stack AI PDF processing platform using AWS Bedrock (Titan Text v2)</li>
-                  <li>Implemented RAG with transparent chunk highlighting for traceability</li>
-                  <li>Demoed to senior engineers, executives, and CEO Dan Houston</li>
-                </ul>
-              </AnimatedCard>
-
-              <AnimatedCard delay={0.1}>
-                <h3>Software Engineering Intern (Incoming 2026)</h3>
-                <p className="card-subtitle">John Deere Headquarters · May 2026 – Jul 2026</p>
-                <ul className="card-list">
-                  <li>Building production-grade AI pipelines for large-scale industrial systems</li>
-                  <li>Migrating LangGraph workflows onto Google&apos;s A2A framework</li>
-                  <li>Designing high-speed retrieval paths with Postgres and vector search</li>
-                </ul>
-              </AnimatedCard>
-            </div>
+            <ExperienceTimeline />
           </CollapsibleSection>
 
           {/* Education */}
@@ -299,12 +279,29 @@ export default function HomePage() {
                   <li>Shipped for stakeholders and demoed to leadership</li>
                 </ul>
 
-                <div style={{ marginTop: 14 }}>
-                  
-                  <button className="btn ghost" onClick={viewCaseStudy("principal-ai-pdf")}>
-                    View case study →
-                  </button>
-                </div>
+                <motion.button
+                  className="btn-case-study"
+                  onClick={viewCaseStudy("principal-ai-pdf")}
+                  initial="rest"
+                  animate="rest"
+                  whileHover="hover"
+                  whileTap="tap"
+                  variants={{
+                    rest: { scale: 1 },
+                    hover: { scale: 1.03 },
+                    tap: { scale: 0.97 },
+                  }}
+                >
+                  <span>View case study</span>
+                  <motion.span
+                    className="btn-case-study-arrow"
+                    aria-hidden
+                    variants={{ rest: { x: 0 }, hover: { x: 6 } }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  >
+                    →
+                  </motion.span>
+                </motion.button>
               </AnimatedCard>
 
               <AnimatedCard delay={0.1}>
@@ -317,17 +314,34 @@ export default function HomePage() {
                 </p>
 
                 <ul className="card-list">
-                  <li>National winner — NASA App Development Challenge</li>
-                  <li>Interactive exploration / simulation experience</li>
-                  <li>Designed for storytelling + demo mode stability</li>
+                  <li>National winner of the NASA App Development Challenge</li>
+                  <li>Interactive exploration and simulation experience</li>
+                  <li>Designed for storytelling and demo mode stability</li>
                 </ul>
 
-                <div style={{ marginTop: 14 }}>
-                  
-                  <button className="btn ghost" onClick={viewCaseStudy("nasa-adc")}>
-                    View case study →
-                  </button>
-                </div>
+                <motion.button
+                  className="btn-case-study"
+                  onClick={viewCaseStudy("nasa-adc")}
+                  initial="rest"
+                  animate="rest"
+                  whileHover="hover"
+                  whileTap="tap"
+                  variants={{
+                    rest: { scale: 1 },
+                    hover: { scale: 1.03 },
+                    tap: { scale: 0.97 },
+                  }}
+                >
+                  <span>View case study</span>
+                  <motion.span
+                    className="btn-case-study-arrow"
+                    aria-hidden
+                    variants={{ rest: { x: 0 }, hover: { x: 6 } }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  >
+                    →
+                  </motion.span>
+                </motion.button>
               </AnimatedCard>
             </div>
           </CollapsibleSection>

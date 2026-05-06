@@ -118,10 +118,11 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         className="cp-trigger"
         onClick={() => setOpen((v) => !v)}
         animate={{
-          width: open ? 360 : 150,
+          width: open ? 360 : 180,
         }}
         transition={{ type: "spring", stiffness: 420, damping: 34 }}
       >
+        <SearchIcon className="cp-icon" />
         {/* When closed: fake placeholder. When open: real input */}
         <AnimatePresence initial={false} mode="wait">
           {!open ? (
@@ -133,8 +134,11 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
               exit={{ opacity: 0, y: 2 }}
               transition={{ duration: 0.12 }}
             >
-              <span className="cp-placeholder">Search…</span>
-              <span className="cp-kbd">⌘K</span>
+              <span className="cp-placeholder">Search</span>
+              <span className="cp-kbd">
+                <kbd>⌘</kbd>
+                <kbd>K</kbd>
+              </span>
             </motion.div>
           ) : (
             <motion.div
@@ -152,10 +156,12 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 className="cp-input"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search…"
+                placeholder="Search anything…"
                 aria-label="Search commands"
               />
-              <span className="cp-kbd">⌘K</span>
+              <span className="cp-kbd">
+                <kbd>esc</kbd>
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -206,5 +212,25 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
   );
 }

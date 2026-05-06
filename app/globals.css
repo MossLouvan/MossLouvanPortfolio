@@ -268,20 +268,81 @@ html:not(.dark) .cp-item {
 }
 /* ─── Command Palette (clean + anchored) ───────────────────── */
 .cp-trigger {
+  height: 36px;
+  padding: 0 6px 0 14px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: transparent;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
   color: var(--fg);
-  padding: 8px 12px;
-  border-radius: 12px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  transition: opacity 0.2s ease;
+  font-size: 0.88rem;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cp-trigger:hover {
-  opacity: 0.75;
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  border-color: color-mix(in srgb, var(--fg) 30%, transparent);
+}
+
+.cp-trigger:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.cp-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.cp-trigger-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.cp-placeholder {
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.005em;
+}
+
+.cp-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.cp-kbd kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.cp-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
 }
 
 .cp-hint {
@@ -558,6 +619,46 @@ html:not(.dark) .typewriter-highlight {
   border: 1px solid var(--border);
 }
 
+/* ─── Case study button ────────────────────────────────────── */
+.btn-case-study {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.btn-case-study:hover {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+  box-shadow: 0 6px 20px -8px color-mix(in srgb, var(--fg) 60%, transparent);
+}
+
+.btn-case-study:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+.btn-case-study-arrow {
+  display: inline-block;
+  font-size: 1.05em;
+  line-height: 1;
+}
+
 /* ─── Sections ────────────────────────────────────────────── */
 .collapsible-section {
   border-top: 1px solid var(--border);
@@ -622,6 +723,89 @@ html:not(.dark) .typewriter-highlight {
   margin: 0 0 1rem;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+/* ─── Experience timeline ─────────────────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 11px;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 2px;
+  background: var(--muted);
+  opacity: 0.35;
+  transform-origin: top center;
+  border-radius: 2px;
+}
+
+.timeline-entry {
+  position: relative;
+  margin-bottom: 2.75rem;
+}
+
+.timeline-entry:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  display: block;
+  position: absolute;
+  left: -2.05rem;
+  top: 0.55rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--fg);
+  box-shadow: 0 0 0 4px var(--bg);
+}
+
+.timeline-date {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.timeline-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.timeline-card-heading {
+  min-width: 0;
+}
+
+.timeline-card-heading h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.timeline-card-heading .card-subtitle {
+  margin: 0 0 0.15rem;
+  font-size: 0.9rem;
+}
+
+.timeline-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.timeline-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .card-body,
