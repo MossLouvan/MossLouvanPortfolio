@@ -411,8 +411,7 @@ export default function HomePage() {
           <footer className="footer">
             <p>© {new Date().getFullYear()} Moss Louvan. All rights reserved.</p>
             <p>
-              Contact: <a href="mailto:mosslouvan67@gmail.com">mosslouvan67@gmail.com</a> ·{" "}
-              <a href="tel:+15158039201">(515) 803-9201</a>
+              Contact: <a href="mailto:mosslouvan67@gmail.com">mosslouvan67@gmail.com</a>
             </p>
           </footer>
         </main>
