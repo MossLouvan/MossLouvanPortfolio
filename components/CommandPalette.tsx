@@ -120,7 +120,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         type="button"
         className="cp-trigger"
         onClick={() => setOpen((v) => !v)}
-        animate={{ width: open ? 320 : 184 }}
+        animate={{ width: open ? 340 : 184 }}
         transition={{ type: "spring", stiffness: 420, damping: 34 }}
         aria-label="Open search"
       >
@@ -167,9 +167,9 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         {open && (
           <motion.div
             className="cp-panel"
-            initial={{ opacity: 0, y: 6, scale: 0.985 }}
-            animate={{ opacity: 1, y: 10, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.985 }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 10 }}
+            exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.14, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
           >

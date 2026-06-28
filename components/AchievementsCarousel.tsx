@@ -143,18 +143,21 @@ export default function AchievementsCarousel({
           })}
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={active}
-            className="ach-coverflow-caption"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: reduce ? 0 : 0.2 }}
-          >
-            {activeCaption}
-          </motion.p>
-        </AnimatePresence>
+        {/* fixed-height wrapper so the controls below never shift between captions */}
+        <div className="ach-coverflow-caption">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={active}
+              className="ach-coverflow-caption-text"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: reduce ? 0 : 0.2 }}
+            >
+              {activeCaption}
+            </motion.p>
+          </AnimatePresence>
+        </div>
 
         <div className="ach-controls">
           <button className="ach-nav" onClick={prev} aria-label="Previous">
