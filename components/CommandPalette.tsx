@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { modKeyLabel, usePlatform } from "@/lib/usePlatform";
+import { usePlatform } from "@/lib/usePlatform";
 
 export type CommandItem = {
   id: string;
@@ -114,8 +114,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     return Array.from(out.entries());
   }, [filtered]);
 
-  const modKey = modKeyLabel(isApple);
-
   return (
     <div ref={rootRef} className="cp-root" data-open={open ? "true" : "false"}>
       <motion.button
@@ -138,10 +136,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
               transition={{ duration: 0.1 }}
             >
               <span className="cp-placeholder">Search</span>
-              <span className="cp-kbd">
-                <kbd>{modKey}</kbd>
-                <kbd>K</kbd>
-              </span>
+              <span className="cp-kbd">{isApple ? "⌘K" : "Ctrl K"}</span>
             </motion.div>
           ) : (
             <motion.div
@@ -162,9 +157,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 aria-label="Search"
                 autoFocus
               />
-              <span className="cp-kbd">
-                <kbd>esc</kbd>
-              </span>
+              <span className="cp-kbd">esc</span>
             </motion.div>
           )}
         </AnimatePresence>

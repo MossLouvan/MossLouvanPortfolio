@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 type DocWithVT = Document & {
   startViewTransition?: (callback: () => void) => { ready: Promise<void> };
@@ -15,40 +15,35 @@ export default function ThemeToggle() {
   // Read whatever the pre-paint script already applied (saved choice or OS preference).
   useEffect(() => {
     setMounted(true);
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
-  if (!mounted || !theme) return <div style={{ width: 54, height: 28 }} />;
+  // Reserve the same footprint before mount to avoid layout shift.
+  if (!mounted || !theme) return <div className="theme-toggle" aria-hidden />;
 
   const isDark = theme === "dark";
 
   const applyTheme = (next: "light" | "dark") => {
-    // Color flips immediately — this is what makes the toggle feel responsive.
     document.documentElement.classList.toggle("dark", next === "dark");
     setTheme(next);
     try {
       window.localStorage.setItem("theme", next);
     } catch {
-      // ignore (private mode etc.)
+      // ignore
     }
   };
 
   const toggleTheme = () => {
     const next: "light" | "dark" = isDark ? "light" : "dark";
-
     const prefersReduced =
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-
     const doc = document as DocWithVT;
 
-    // No View Transitions support (or reduced motion) → flip instantly, no flourish.
     if (prefersReduced || !doc.startViewTransition) {
       applyTheme(next);
       return;
     }
 
-    // Circular reveal that grows from the toggle button.
     const rect = buttonRef.current?.getBoundingClientRect();
     const x = rect ? rect.left + rect.width / 2 : window.innerWidth - 40;
     const y = rect ? rect.top + rect.height / 2 : 40;
@@ -75,61 +70,32 @@ export default function ThemeToggle() {
         );
       })
       .catch(() => {
-        /* transition skipped — theme already applied */
+        /* transition skipped */
       });
   };
 
   return (
     <motion.button
       ref={buttonRef}
+      type="button"
+      className="theme-toggle"
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
-      whileTap={{ scale: 0.94 }}
-      style={{
-        position: "relative",
-        display: "inline-flex",
-        alignItems: "center",
-        width: 54,
-        height: 28,
-        borderRadius: 999,
-        border: "1px solid var(--border)",
-        background: "transparent",
-        cursor: "pointer",
-        padding: 3,
-        outline: "none",
-        flexShrink: 0,
-      }}
+      whileTap={{ scale: 0.92 }}
     >
-      {/* Sliding knob */}
-      <motion.span
-        animate={{ x: isDark ? 0 : 26 }}
-        transition={{ type: "spring", stiffness: 500, damping: 35 }}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 22,
-          height: 22,
-          borderRadius: "50%",
-          background: "var(--fg)",
-          color: "var(--bg)",
-          flexShrink: 0,
-        }}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={theme}
-            initial={{ scale: 0.5, opacity: 0, rotate: -30 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: 30 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            style={{ display: "flex", lineHeight: 1 }}
-          >
-            {isDark ? <MoonIcon size={11} /> : <SunIcon size={11} />}
-          </motion.span>
-        </AnimatePresence>
-      </motion.span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={theme}
+          className="theme-toggle-icon"
+          initial={{ scale: 0.4, opacity: 0, rotate: -40 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          exit={{ scale: 0.4, opacity: 0, rotate: 40 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          {isDark ? <MoonIcon size={16} /> : <SunIcon size={16} />}
+        </motion.span>
+      </AnimatePresence>
     </motion.button>
   );
 }
@@ -142,7 +108,7 @@ function SunIcon({ size }: { size: number }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.5}
+      strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
