@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { CASE_STUDIES } from "@/data/caseStudies";
 import type { Project } from "@/data/projects";
-import SystemDiagram from "@/components/SystemDiagram";
 import LinkIcon from "@/components/LinkIcon";
 
 export default function ProjectCard({
@@ -25,23 +24,24 @@ export default function ProjectCard({
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, delay, ease: "easeOut" }}
     >
-      {caseStudy && (
-        // Architecture-first: the diagram is the card's cover. Clicking opens the
-        // drawer (which defaults to the Architecture tab).
+      {caseStudy?.flow && (
+        // Architecture-first: a plain-language "how it works" flow is the card's
+        // cover. Clicking opens the drawer (full diagram + components).
         <button
           type="button"
           className="project-arch"
           onClick={() => onViewCaseStudy(project.slug)}
-          aria-label={`View ${project.title} architecture`}
+          aria-label={`View ${project.title} case study`}
         >
-          <span className="project-arch-label">Architecture</span>
-          <SystemDiagram
-            nodes={caseStudy.architecture.nodes}
-            edges={caseStudy.architecture.edges}
-            imageSrc={caseStudy.diagramImage}
-            imageAlt={`${project.title} architecture`}
-            frame={false}
-          />
+          <span className="project-arch-label">How it works</span>
+          <ol className="project-flow">
+            {caseStudy.flow.map((step, i) => (
+              <li key={i} className="project-flow-step">
+                <span className="project-flow-num">{i + 1}</span>
+                <span className="project-flow-text">{step}</span>
+              </li>
+            ))}
+          </ol>
         </button>
       )}
 

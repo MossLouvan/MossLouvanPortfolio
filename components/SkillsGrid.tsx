@@ -21,9 +21,7 @@ function SkillTile({ skill, index, inView }: { skill: Skill; index: number; inVi
     >
       <div className="skill-logo">
         {skill.monogram ? (
-          <span className="skill-monogram" style={{ background: skill.brandColor ?? "#555" }}>
-            {monogramText(skill.name)}
-          </span>
+          <span className="skill-monogram">{skill.mono ?? monogramText(skill.name)}</span>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={`/logos/skills/${skill.slug}.svg`} alt={`${skill.name} logo`} loading="lazy" />

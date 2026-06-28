@@ -20,6 +20,9 @@ export type CaseStudy = {
   /** Optional real diagram image (PNG/SVG in /public); overrides the generated SVG when set. */
   diagramImage?: string;
 
+  /** Plain-language ordered pipeline — the easy-to-read "how it works". */
+  flow?: string[];
+
   impact: {
     bullets: string[];
   };
@@ -31,6 +34,12 @@ export const CASE_STUDIES: CaseStudy[] = [
     title: "NASA South Pole Lunar Exploration App",
     subtitle: "Lead Coder & Game Developer",
     timeframe: "Oct 2023 – Apr 2024",
+    flow: [
+      "Load real lunar south-pole terrain data",
+      "Run mission logic, navigation & constraints",
+      "Explore in an AI-assisted rover simulator",
+      "Present in a demo-stable storytelling mode",
+    ],
     links: [
       { label: "Email me about it", href: "mailto:mosslouvan67@gmail.com?subject=NASA%20Case%20Study" },
       // Add demo/repo if you want:
@@ -80,6 +89,12 @@ export const CASE_STUDIES: CaseStudy[] = [
     title: "AI PDF Processing Platform",
     subtitle: "Contracted AI Software Engineer · Principal Financial Group",
     timeframe: "Jun 2024 – Aug 2024",
+    flow: [
+      "Ingest & parse uploaded PDFs",
+      "Chunk the text and generate embeddings",
+      "Store vectors for fast semantic retrieval",
+      "Answer questions with highlighted source evidence",
+    ],
     links: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" },
     ],
@@ -128,6 +143,12 @@ export const CASE_STUDIES: CaseStudy[] = [
     title: "Converge",
     subtitle: "Full-Stack Developer · SwanHacks Spring 2026 (Iowa State)",
     timeframe: "May 2026",
+    flow: [
+      "Capture lecture audio (or upload a recording)",
+      "Transcribe live with Deepgram + Whisper",
+      "Generate notes, flashcards & quizzes (GPT-4o-mini)",
+      "Study with spaced repetition + accessibility tools",
+    ],
     links: [
       { label: "GitHub", href: "https://github.com/jackulau/SwanHacksSpring2026" },
       { label: "Devpost", href: "https://devpost.com/software/converge-4ek5ho" },

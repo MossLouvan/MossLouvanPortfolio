@@ -97,6 +97,18 @@ export default function CaseStudyDrawer({
               {tab === "architecture" && (
                 <div className="csd-section">
                   <h3>How it works</h3>
+                  {study.flow && (
+                    <ol className="project-flow csd-flow">
+                      {study.flow.map((step, i) => (
+                        <li key={i} className="project-flow-step">
+                          <span className="project-flow-num">{i + 1}</span>
+                          <span className="project-flow-text">{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+
+                  <h3>System diagram</h3>
                   <SystemDiagram
                     nodes={study.architecture.nodes}
                     edges={study.architecture.edges}

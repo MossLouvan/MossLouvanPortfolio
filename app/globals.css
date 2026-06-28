@@ -654,12 +654,11 @@ html:not(.dark) .typewriter-highlight {
   position: relative;
   display: block;
   width: 100%;
-  max-height: 172px;
-  overflow: hidden;
+  text-align: left;
   border-radius: 14px;
   border: 1px solid var(--surface-border);
   background: var(--surface-2);
-  padding: 10px 10px 0;
+  padding: 34px 16px 16px;
   cursor: pointer;
   transition: border-color 0.18s ease, transform 0.18s ease;
 }
@@ -667,17 +666,6 @@ html:not(.dark) .typewriter-highlight {
 .project-arch:hover {
   border-color: var(--surface-border-strong);
   transform: translateY(-2px);
-}
-
-.project-arch::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 64px;
-  background: linear-gradient(to bottom, transparent, var(--surface-2));
-  pointer-events: none;
 }
 
 .project-arch-label {
@@ -694,6 +682,62 @@ html:not(.dark) .typewriter-highlight {
   border: 1px solid var(--surface-border);
   padding: 3px 8px;
   border-radius: 999px;
+}
+
+/* Plain-language numbered "how it works" flow */
+.project-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.project-flow-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding-bottom: 0.85rem;
+}
+
+.project-flow-step:last-child {
+  padding-bottom: 0;
+}
+
+/* vertical connector to the next step */
+.project-flow-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 22px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--surface-border);
+}
+
+.project-flow-num {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+
+.project-flow-text {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  padding-top: 2px;
+  color: color-mix(in srgb, var(--fg) 82%, transparent);
+}
+
+.csd-flow {
+  margin: 10px 0 6px;
 }
 
 .project-tags {
@@ -1175,13 +1219,15 @@ html:not(.dark) .typewriter-highlight {
 .skill-monogram {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  /* fixed dark chip — always legible on the white logo tile, both themes */
+  background: #232634;
   color: #fff;
   font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
 }
 
 .skill-name {
