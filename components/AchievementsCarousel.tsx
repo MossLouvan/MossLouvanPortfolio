@@ -47,8 +47,9 @@ export default function AchievementsCarousel({
     return () => ro.disconnect();
   }, [images.length]);
 
+  // wraps around so the deck loops infinitely in both directions
   const go = useCallback(
-    (i: number) => setActive(Math.max(0, Math.min(i, images.length - 1))),
+    (i: number) => setActive(((i % images.length) + images.length) % images.length),
     [images.length]
   );
   const next = useCallback(() => go(active + 1), [active, go]);
@@ -102,7 +103,11 @@ export default function AchievementsCarousel({
       >
         <div className="ach-stage" ref={stageRef}>
           {images.map((src, i) => {
-            const offset = i - active;
+            // circular offset → shortest path around the ring (enables looping)
+            const n = images.length;
+            let offset = i - active;
+            if (offset > n / 2) offset -= n;
+            if (offset < -n / 2) offset += n;
             const abs = Math.abs(offset);
             const hidden = abs > 2;
             const caption = captionFor(src);
@@ -152,7 +157,7 @@ export default function AchievementsCarousel({
         </AnimatePresence>
 
         <div className="ach-controls">
-          <button className="ach-nav" onClick={prev} disabled={active === 0} aria-label="Previous">
+          <button className="ach-nav" onClick={prev} aria-label="Previous">
             ‹
           </button>
           <div className="ach-dots" role="tablist">
@@ -167,12 +172,7 @@ export default function AchievementsCarousel({
               />
             ))}
           </div>
-          <button
-            className="ach-nav"
-            onClick={next}
-            disabled={active === images.length - 1}
-            aria-label="Next"
-          >
+          <button className="ach-nav" onClick={next} aria-label="Next">
             ›
           </button>
         </div>
