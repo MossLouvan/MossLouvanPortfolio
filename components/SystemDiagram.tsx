@@ -1,14 +1,16 @@
 "use client";
 
+import React, { useRef, useState } from "react";
+
 /**
- * A clean, deterministic architecture diagram.
+ * A clean, deterministic architecture diagram with draggable nodes.
  *
  * - Top→down layered flow (longest-path layering) so data direction is obvious.
  * - Arrowheads on every edge; nodes ordered to minimise crossings.
- * - Pure SVG sized by viewBox → fits its container perfectly on load (no pan/zoom,
- *   never over-zoomed or clipped).
+ * - Pure SVG sized by viewBox → fits its container perfectly on load.
+ * - Nodes are draggable (pointer / touch) to rearrange; edges follow.
  * - Theme-aware via CSS variables.
- * - If `imageSrc` is provided, renders that image instead (drop-in real diagrams later).
+ * - If `imageSrc` is provided, renders that image instead.
  */
 
 export type DiagramNode = { id: string; label: string };
@@ -20,7 +22,7 @@ const PAD_TOP = 14;
 const PAD_BOTTOM = 16;
 const NODE_H = 50;
 const NODE_GAP = 16;
-const ROW_STRIDE = 92; // top-to-top distance between rows
+const ROW_STRIDE = 92;
 const MAX_NODE_W = 240;
 
 function computeLayers(nodes: DiagramNode[], edges: DiagramEdge[]): Map<string, number> {
@@ -33,7 +35,6 @@ function computeLayers(nodes: DiagramNode[], edges: DiagramEdge[]): Map<string, 
   const layer = new Map<string, number>();
   nodes.forEach((n) => layer.set(n.id, 0));
 
-  // Longest-path layering (iterate to stabilise; bounded by node count for safety)
   for (let iter = 0; iter < nodes.length; iter++) {
     let changed = false;
     for (const n of nodes) {
@@ -49,7 +50,8 @@ function computeLayers(nodes: DiagramNode[], edges: DiagramEdge[]): Map<string, 
   return layer;
 }
 
-type Placed = { node: DiagramNode; x: number; y: number; w: number; cx: number };
+type Placed = { x: number; y: number; w: number; cx: number };
+type Offset = { dx: number; dy: number };
 
 export default function SystemDiagram({
   nodes,
@@ -62,10 +64,18 @@ export default function SystemDiagram({
   edges: DiagramEdge[];
   imageSrc?: string;
   imageAlt?: string;
-  /** when false, drops the bordered/padded wrapper (for use inside a card preview) */
   frame?: boolean;
 }) {
   const wrapClass = frame ? "sysdiagram" : "sysdiagram sysdiagram-bare";
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [offsets, setOffsets] = useState<Record<string, Offset>>({});
+  const dragRef = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    baseDx: number;
+    baseDy: number;
+  } | null>(null);
 
   if (imageSrc) {
     return (
@@ -79,8 +89,7 @@ export default function SystemDiagram({
   const layer = computeLayers(nodes, edges);
   const maxLayer = Math.max(0, ...nodes.map((n) => layer.get(n.id) ?? 0));
 
-  // group + place
-  const placed = new Map<string, Placed>();
+  const base = new Map<string, Placed>();
   for (let r = 0; r <= maxLayer; r++) {
     const rowNodes = nodes.filter((n) => (layer.get(n.id) ?? 0) === r);
     const k = rowNodes.length;
@@ -90,20 +99,62 @@ export default function SystemDiagram({
     const y = PAD_TOP + r * ROW_STRIDE;
     rowNodes.forEach((node, i) => {
       const x = startX + i * (nodeW + NODE_GAP);
-      placed.set(node.id, { node, x, y, w: nodeW, cx: x + nodeW / 2 });
+      base.set(node.id, { x, y, w: nodeW, cx: x + nodeW / 2 });
     });
   }
 
   const H = PAD_TOP + maxLayer * ROW_STRIDE + NODE_H + PAD_BOTTOM;
 
+  const posOf = (id: string): Placed => {
+    const p = base.get(id)!;
+    const o = offsets[id] ?? { dx: 0, dy: 0 };
+    return { x: p.x + o.dx, y: p.y + o.dy, w: p.w, cx: p.cx + o.dx };
+  };
+
+  const scaleNow = () => {
+    const svg = svgRef.current;
+    return svg && svg.clientWidth ? svg.clientWidth / W : 1;
+  };
+
+  const startDrag = (e: React.PointerEvent, id: string) => {
+    e.preventDefault();
+    const o = offsets[id] ?? { dx: 0, dy: 0 };
+    dragRef.current = { id, startX: e.clientX, startY: e.clientY, baseDx: o.dx, baseDy: o.dy };
+    try {
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+  };
+
+  const moveDrag = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const s = scaleNow();
+    const dx = d.baseDx + (e.clientX - d.startX) / s;
+    const dy = d.baseDy + (e.clientY - d.startY) / s;
+    setOffsets((prev) => ({ ...prev, [d.id]: { dx, dy } }));
+  };
+
+  const endDrag = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    try {
+      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <div className={wrapClass}>
       <svg
+        ref={svgRef}
         className="sysdiagram-svg"
         viewBox={`0 0 ${W} ${H}`}
         width="100%"
         role="img"
-        aria-label="System architecture diagram"
+        aria-label="System architecture diagram (drag the boxes to rearrange)"
       >
         <defs>
           <marker
@@ -121,13 +172,13 @@ export default function SystemDiagram({
 
         {/* edges */}
         {edges.map((e, idx) => {
-          const a = placed.get(e.from);
-          const b = placed.get(e.to);
+          const a = base.get(e.from) ? posOf(e.from) : null;
+          const b = base.get(e.to) ? posOf(e.to) : null;
           if (!a || !b) return null;
           const ax = a.cx;
           const ay = a.y + NODE_H;
           const bx = b.cx;
-          const by = b.y - 6; // stop short so the arrowhead sits cleanly at the node edge
+          const by = b.y - 6;
           const dy = (by - ay) / 2;
           return (
             <path
@@ -141,25 +192,35 @@ export default function SystemDiagram({
           );
         })}
 
-        {/* nodes */}
-        {[...placed.values()].map(({ node, x, y, w }) => (
-          <g key={node.id}>
-            <rect
-              x={x}
-              y={y}
-              rx={12}
-              ry={12}
-              width={w}
-              height={NODE_H}
-              fill="var(--diagram-node)"
-              stroke="var(--diagram-node-border)"
-              strokeWidth={1}
-            />
-            <foreignObject x={x} y={y} width={w} height={NODE_H}>
-              <div className="sysdiagram-node-label">{node.label}</div>
-            </foreignObject>
-          </g>
-        ))}
+        {/* nodes (draggable) */}
+        {nodes.map((node) => {
+          const p = posOf(node.id);
+          return (
+            <g
+              key={node.id}
+              className="sysdiagram-node"
+              onPointerDown={(e) => startDrag(e, node.id)}
+              onPointerMove={moveDrag}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+            >
+              <rect
+                x={p.x}
+                y={p.y}
+                rx={12}
+                ry={12}
+                width={p.w}
+                height={NODE_H}
+                fill="var(--diagram-node)"
+                stroke="var(--diagram-node-border)"
+                strokeWidth={1}
+              />
+              <foreignObject x={p.x} y={p.y} width={p.w} height={NODE_H}>
+                <div className="sysdiagram-node-label">{node.label}</div>
+              </foreignObject>
+            </g>
+          );
+        })}
       </svg>
     </div>
   );

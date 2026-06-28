@@ -1510,6 +1510,15 @@ html:not(.dark) .typewriter-highlight {
   display: block;
   width: 100%;
   height: auto;
+  touch-action: none; /* allow dragging nodes on touch devices */
+}
+
+.sysdiagram-node {
+  cursor: grab;
+}
+
+.sysdiagram-node:active {
+  cursor: grabbing;
 }
 
 .sysdiagram-img {
@@ -1531,6 +1540,8 @@ html:not(.dark) .typewriter-highlight {
   line-height: 1.2;
   color: var(--diagram-text);
   font-family: inherit;
+  pointer-events: none; /* let drags hit the node group, not the label */
+  user-select: none;
 }
 
 /* ─── Responsive ──────────────────────────────────────────── */
