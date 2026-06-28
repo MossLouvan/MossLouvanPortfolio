@@ -17,6 +17,9 @@ export type CaseStudy = {
     edges: { from: string; to: string }[];
   };
 
+  /** Optional real diagram image (PNG/SVG in /public); overrides the generated SVG when set. */
+  diagramImage?: string;
+
   impact: {
     bullets: string[];
   };
@@ -116,6 +119,60 @@ export const CASE_STUDIES: CaseStudy[] = [
         "Improved trust via chunk highlighting + evidence-first UX",
         "Streamlined PDF exploration for technical and non-technical stakeholders",
         "Delivered demo-ready system for leadership review",
+      ],
+    },
+  },
+
+  {
+    slug: "converge",
+    title: "Converge",
+    subtitle: "Full-Stack Developer · SwanHacks Spring 2026 (Iowa State)",
+    timeframe: "May 2026",
+    links: [
+      { label: "GitHub", href: "https://github.com/jackulau/SwanHacksSpring2026" },
+      { label: "Devpost", href: "https://devpost.com/software/converge-4ek5ho" },
+    ],
+    overview: {
+      problem:
+        "Students juggle Otter.ai, Notion, Quizlet, Anki and their calendar to keep up with lectures — and accessibility is usually an afterthought.",
+      role:
+        "Full-stack developer on a 4-person team. Built capture → transcript → study pipeline pieces, Canvas integration, and the accessibility layer.",
+      solution:
+        "One AI-powered platform that captures lectures, transcribes them in real time, and auto-generates notes, flashcards, and quizzes — with deep accessibility built in from the start.",
+      highlights: [
+        "Real-time captions via Deepgram (Nova-2) + batch transcription via OpenAI Whisper",
+        "Auto-generated notes, flashcards (SM-2 spaced repetition), and quizzes via GPT-4o-mini",
+        "ASL fingerspelling-to-text using fully client-side MediaPipe hand tracking",
+        "Accessibility-first: text-to-speech, dyslexia-friendly fonts, reading ruler, focus mode",
+        "Canvas LMS integration maps study materials to the right courses",
+      ],
+    },
+    architecture: {
+      nodes: [
+        { id: "capture", label: "Capture / Upload", desc: "Record lecture audio in the browser or upload a recording." },
+        { id: "asl", label: "ASL Input (MediaPipe)", desc: "Client-side hand tracking turns ASL fingerspelling into text." },
+        { id: "canvas", label: "Canvas LMS", desc: "Pulls courses so study materials map to the right class." },
+        { id: "stt", label: "Speech-to-Text (Deepgram · Whisper)", desc: "Live Deepgram Nova-2 stream + batch Whisper transcription." },
+        { id: "transcript", label: "Transcript", desc: "Unified, timestamped transcript that drives everything downstream." },
+        { id: "ai", label: "AI Pipeline (GPT-4o-mini)", desc: "Five-stage pipeline: clean up → notes → flashcards → quiz." },
+        { id: "study", label: "Notes · Flashcards · Quizzes", desc: "Study artifacts with SM-2 spaced repetition + Pomodoro sessions." },
+        { id: "store", label: "PocketBase", desc: "Backend + database persisting users, lectures, and study data." },
+      ],
+      edges: [
+        { from: "capture", to: "stt" },
+        { from: "stt", to: "transcript" },
+        { from: "asl", to: "transcript" },
+        { from: "transcript", to: "ai" },
+        { from: "ai", to: "study" },
+        { from: "canvas", to: "study" },
+        { from: "study", to: "store" },
+      ],
+    },
+    impact: {
+      bullets: [
+        "Built end-to-end at SwanHacks Spring 2026 (Iowa State) with a 4-person team",
+        "Converges five separate study tools into one accessible workflow",
+        "Accessibility is core, not bolted on — designed for every student",
       ],
     },
   },

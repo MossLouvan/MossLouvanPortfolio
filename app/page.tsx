@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 import ThemeToggle from "@/components/ThemeToggle";
 import CollapsibleSection from "@/components/CollapsibleSection";
-import ChipGroup from "@/components/ChipGroup";
+import SkillsGrid from "@/components/SkillsGrid";
 import AnimatedCard from "@/components/AnimatedCard";
-import AchievementsGallery from "@/components/AchievementsGallery";
+import AchievementsCarousel from "@/components/AchievementsCarousel";
 import Typewriter from "@/components/Typewriter";
 import ExperienceTimeline from "@/components/ExperienceTimeline";
 
@@ -15,6 +15,9 @@ import CommandPalette, { CommandItem } from "@/components/CommandPalette";
 import CaseStudyDrawer from "@/components/CaseStudyDrawer";
 import { CASE_STUDIES } from "@/data/caseStudies";
 import type { CaseStudy } from "@/data/caseStudies";
+import { ALL_SKILLS } from "@/data/skills";
+import { PROJECTS } from "@/data/projects";
+import ProjectCard from "@/components/ProjectCard";
 
 export default function HomePage() {
   const [images, setImages] = useState<string[]>([]);
@@ -55,12 +58,6 @@ export default function HomePage() {
     setCsOpen(false);
   }, []);
 
-  // helper for buttons
-  const viewCaseStudy = useCallback(
-    (slug: string) => () => openCaseStudy(slug),
-    [openCaseStudy]
-  );
-
   useEffect(() => {
     async function loadImages() {
       try {
@@ -76,15 +73,107 @@ export default function HomePage() {
   }, []);
 
   const COMMANDS: CommandItem[] = useMemo(() => {
+    // Curated suggestions shown when the search box is empty
     const nav: CommandItem[] = [
-      { id: "nav-about", group: "Navigation", label: "Go to About", href: "#about" },
-      { id: "nav-exp", group: "Navigation", label: "Go to Experience", href: "#experience" },
-      { id: "nav-edu", group: "Navigation", label: "Go to Education", href: "#education" },
-      { id: "nav-proj", group: "Navigation", label: "Go to Projects", href: "#projects" },
-      { id: "nav-ach", group: "Navigation", label: "Go to Achievements", href: "#achievements" },
-      { id: "nav-lead", group: "Navigation", label: "Go to Leadership", href: "#leadership" },
-      { id: "nav-skill", group: "Navigation", label: "Go to Skills", href: "#skills" },
+      { id: "nav-about", group: "Navigation", label: "About", href: "#about", meta: "Section", suggested: true },
+      { id: "nav-exp", group: "Navigation", label: "Experience", href: "#experience", meta: "Section", suggested: true },
+      { id: "nav-edu", group: "Navigation", label: "Education", href: "#education", meta: "Section", suggested: true },
+      { id: "nav-proj", group: "Navigation", label: "Projects", href: "#projects", meta: "Section", suggested: true },
+      { id: "nav-ach", group: "Navigation", label: "Achievements", href: "#achievements", meta: "Section", suggested: true },
+      { id: "nav-lead", group: "Navigation", label: "Leadership", href: "#leadership", meta: "Section", suggested: true },
+      { id: "nav-skill", group: "Navigation", label: "Skills", href: "#skills", meta: "Section", suggested: true },
     ];
+
+    const caseStudies: CommandItem[] = CASE_STUDIES.map((s) => ({
+      id: `cs-${s.slug}`,
+      group: "Case Studies",
+      label: s.title,
+      meta: "Case study",
+      keywords: [s.subtitle ?? "", s.timeframe ?? "", s.slug],
+      suggested: true,
+      action: () => openCaseStudy(s.slug),
+    }));
+
+    const experience: CommandItem[] = [
+      {
+        id: "exp-nasa",
+        group: "Experience",
+        label: "Simulation Developer · NASA",
+        href: "#experience",
+        keywords: ["nasa", "app development challenge", "houston", "johnson space center", "lunar", "simulation"],
+      },
+      {
+        id: "exp-principal",
+        group: "Experience",
+        label: "Contracted AI Software Engineer · Principal Financial Group",
+        href: "#experience",
+        keywords: ["principal", "rag", "aws bedrock", "titan", "dan houston", "pdf", "ai"],
+      },
+      {
+        id: "exp-isu",
+        group: "Experience",
+        label: "Software Engineering LC Peer Mentor · Iowa State",
+        href: "#experience",
+        keywords: ["iowa state", "mentor", "learning community", "peer", "engineering"],
+      },
+      {
+        id: "exp-deere",
+        group: "Experience",
+        label: "Software Engineer Intern · John Deere",
+        href: "#experience",
+        keywords: ["john deere", "langgraph", "a2a", "postgres", "vector", "pipelines", "moline"],
+      },
+    ];
+
+    const education: CommandItem[] = [
+      {
+        id: "edu-isu",
+        group: "Education",
+        label: "B.S. Software Engineering · Iowa State University",
+        href: "#education",
+        keywords: ["full-ride", "scholar", "ai systems", "iowa state"],
+      },
+      {
+        id: "edu-hs",
+        group: "Education",
+        label: "Valedictorian · Virtual Campus High School",
+        href: "#education",
+        keywords: ["valedictorian", "rank 1", "high school"],
+      },
+    ];
+
+    const leadership: CommandItem[] = [
+      {
+        id: "lead-nasa",
+        group: "Leadership",
+        label: "Team Lead · NASA ADC Winners",
+        href: "#leadership",
+        keywords: ["team lead", "nasa", "national", "competition"],
+      },
+      {
+        id: "lead-speaker",
+        group: "Leadership",
+        label: "Speaker & Presenter",
+        href: "#leadership",
+        keywords: ["technology association of iowa", "talks", "presenter", "speaking"],
+      },
+      {
+        id: "lead-mentor",
+        group: "Leadership",
+        label: "Mentor & STEM Advocate",
+        href: "#leadership",
+        keywords: ["python", "stem", "washington dc", "panelist", "teaching", "mentor"],
+      },
+    ];
+
+    const skills: CommandItem[] = ALL_SKILLS.map((s) => ({
+      id: `skill-${s.slug}`,
+      group: "Skills",
+      label: s.name,
+      href: "#skills",
+      meta: "Skill",
+      keywords: [s.slug],
+    }));
 
     const links: CommandItem[] = [
       {
@@ -92,26 +181,31 @@ export default function HomePage() {
         group: "Links",
         label: "Email Moss",
         href: "mailto:mosslouvan67@gmail.com",
-        keywords: ["contact"],
+        meta: "Contact",
+        suggested: true,
+        keywords: ["contact", "email"],
       },
       {
         id: "link-li",
         group: "Links",
         label: "Open LinkedIn",
         href: "https://www.linkedin.com/in/moss-louvan-4614682a4/",
+        meta: "Profile",
+        suggested: true,
         keywords: ["social", "linkedin"],
+      },
+      {
+        id: "link-gh",
+        group: "Links",
+        label: "Open GitHub",
+        href: "https://github.com/MossLouvan",
+        meta: "Profile",
+        suggested: true,
+        keywords: ["github", "code", "repos"],
       },
     ];
 
-    const caseStudies: CommandItem[] = CASE_STUDIES.map((s) => ({
-      id: `cs-${s.slug}`,
-      group: "Case Studies",
-      label: `Open: ${s.title}`,
-      keywords: [s.subtitle ?? "", s.timeframe ?? "", s.slug],
-      action: () => openCaseStudy(s.slug),
-    }));
-
-    return [...nav, ...links, ...caseStudies];
+    return [...nav, ...caseStudies, ...experience, ...education, ...skills, ...leadership, ...links];
   }, [openCaseStudy]);
 
   return (
@@ -149,7 +243,7 @@ export default function HomePage() {
           </motion.nav>
 
           {/* RIGHT SIDE controls: search + theme toggle */}
-          <div className="header-right" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div className="header-right">
             <CommandPalette commands={COMMANDS} />
             <ThemeToggle />
           </div>
@@ -262,93 +356,20 @@ export default function HomePage() {
           {/* Projects */}
           <CollapsibleSection title="Projects" defaultOpen id="projects">
             <div className="cards-grid">
-              <AnimatedCard>
-                <h3>AI PDF Processing Platform</h3>
-                <p className="card-subtitle">
-                  Contracted AI Software Engineer · Principal Financial Group · Jun 2024 – Aug 2024
-                </p>
-
-                <p className="card-body">
-                  Built an end-to-end AI platform to ingest PDFs, chunk + embed content, and power traceable RAG with
-                  evidence highlighting.
-                </p>
-
-                <ul className="card-list">
-                  <li>RAG pipeline with transparent chunk highlighting</li>
-                  <li>AWS Bedrock (Titan Text + Embeddings) + vector storage</li>
-                  <li>Shipped for stakeholders and demoed to leadership</li>
-                </ul>
-
-                <motion.button
-                  className="btn-case-study"
-                  onClick={viewCaseStudy("principal-ai-pdf")}
-                  initial="rest"
-                  animate="rest"
-                  whileHover="hover"
-                  whileTap="tap"
-                  variants={{
-                    rest: { scale: 1 },
-                    hover: { scale: 1.03 },
-                    tap: { scale: 0.97 },
-                  }}
-                >
-                  <span>View case study</span>
-                  <motion.span
-                    className="btn-case-study-arrow"
-                    aria-hidden
-                    variants={{ rest: { x: 0 }, hover: { x: 6 } }}
-                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                  >
-                    →
-                  </motion.span>
-                </motion.button>
-              </AnimatedCard>
-
-              <AnimatedCard delay={0.1}>
-                <h3>NASA South Pole Lunar Exploration App</h3>
-                <p className="card-subtitle">Lead Coder & Game Developer · Oct 2023 – Apr 2024</p>
-
-                <p className="card-body">
-                  Led development of an AI-assisted lunar rover simulator using real lunar south pole terrain
-                  constraints and mission-oriented exploration workflows.
-                </p>
-
-                <ul className="card-list">
-                  <li>National winner of the NASA App Development Challenge</li>
-                  <li>Interactive exploration and simulation experience</li>
-                  <li>Designed for storytelling and demo mode stability</li>
-                </ul>
-
-                <motion.button
-                  className="btn-case-study"
-                  onClick={viewCaseStudy("nasa-adc")}
-                  initial="rest"
-                  animate="rest"
-                  whileHover="hover"
-                  whileTap="tap"
-                  variants={{
-                    rest: { scale: 1 },
-                    hover: { scale: 1.03 },
-                    tap: { scale: 0.97 },
-                  }}
-                >
-                  <span>View case study</span>
-                  <motion.span
-                    className="btn-case-study-arrow"
-                    aria-hidden
-                    variants={{ rest: { x: 0 }, hover: { x: 6 } }}
-                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                  >
-                    →
-                  </motion.span>
-                </motion.button>
-              </AnimatedCard>
+              {PROJECTS.map((p, i) => (
+                <ProjectCard
+                  key={p.slug}
+                  project={p}
+                  delay={i * 0.08}
+                  onViewCaseStudy={openCaseStudy}
+                />
+              ))}
             </div>
           </CollapsibleSection>
 
           {/* Achievements */}
           <CollapsibleSection title="Achievements & Awards" defaultOpen id="achievements">
-            <AchievementsGallery
+            <AchievementsCarousel
               images={images}
               lightboxOpen={lightboxOpen}
               activeIndex={activeIndex}
@@ -390,22 +411,7 @@ export default function HomePage() {
 
           {/* Skills */}
           <CollapsibleSection title="Technical Stack" defaultOpen={false} id="skills">
-            <div className="skills-grid">
-              <div className="skills-category">
-                <h3 className="skills-title">Languages & Core</h3>
-                <ChipGroup chips={["Python", "Java", "C / C++", "C#", "SQL", "TypeScript"]} />
-              </div>
-
-              <div className="skills-category">
-                <h3 className="skills-title">AI & Tooling</h3>
-                <ChipGroup chips={["LangChain", "LangGraph", "A2A", "AWS Bedrock", "OpenAI"]} />
-              </div>
-
-              <div className="skills-category">
-                <h3 className="skills-title">Infrastructure & Web</h3>
-                <ChipGroup chips={["Postgres", "Docker", "Kubernetes", "Next.js", "React"]} />
-              </div>
-            </div>
+            <SkillsGrid />
           </CollapsibleSection>
 
           <footer className="footer">
