@@ -28,6 +28,11 @@ function SkillTile({ skill, index, inView }: { skill: Skill; index: number; inVi
         )}
       </div>
       <span className="skill-name">{skill.name}</span>
+      {skill.usedAt && (
+        <span className="skill-used" role="tooltip">
+          {skill.usedAt}
+        </span>
+      )}
     </motion.div>
   );
 }
@@ -39,7 +44,10 @@ export default function SkillsGrid() {
   return (
     <div ref={ref} className="skills-grid">
       {SKILL_CATEGORIES.map((cat) => (
-        <div key={cat.title} className="skills-category">
+        <div
+          key={cat.title}
+          className={`skills-category${cat.featured ? " skills-category--core" : ""}`}
+        >
           <h3 className="skills-title">{cat.title}</h3>
           <div className="skill-tiles">
             {cat.skills.map((skill, i) => (

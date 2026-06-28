@@ -24,24 +24,23 @@ export default function ProjectCard({
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, delay, ease: "easeOut" }}
     >
-      {caseStudy?.flow && (
-        // Architecture-first: a plain-language "how it works" flow is the card's
-        // cover. Clicking opens the drawer (full diagram + components).
+      {project.cover && (
+        // Cover image is the card's visual; clicking opens the drawer (which leads
+        // with the "How it works" flow + system diagram).
         <button
           type="button"
-          className="project-arch"
+          className="project-cover"
           onClick={() => onViewCaseStudy(project.slug)}
           aria-label={`View ${project.title} case study`}
         >
-          <span className="project-arch-label">How it works</span>
-          <ol className="project-flow">
-            {caseStudy.flow.map((step, i) => (
-              <li key={i} className="project-flow-step">
-                <span className="project-flow-num">{i + 1}</span>
-                <span className="project-flow-text">{step}</span>
-              </li>
-            ))}
-          </ol>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={project.cover}
+            alt={`${project.title} cover`}
+            className="project-cover-img"
+            data-fit={project.coverFit ?? "cover"}
+            loading="lazy"
+          />
         </button>
       )}
 

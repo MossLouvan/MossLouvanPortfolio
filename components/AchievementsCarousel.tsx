@@ -29,66 +29,30 @@ export default function AchievementsCarousel({
   onPrev,
 }: Props) {
   const reduce = useReducedMotion();
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
+  const [cardW, setCardW] = useState(300);
 
-  // The focused card is whichever card center is nearest the track's centre.
+  // Measure the actual rendered card width so the 3D offsets stay proportional.
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let raf = 0;
-    const recompute = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const center = track.scrollLeft + track.clientWidth / 2;
-        let best = 0;
-        let bestDist = Infinity;
-        cardRefs.current.forEach((c, i) => {
-          if (!c) return;
-          const cardCenter = c.offsetLeft + c.clientWidth / 2;
-          const dist = Math.abs(cardCenter - center);
-          if (dist < bestDist) {
-            bestDist = dist;
-            best = i;
-          }
-        });
-        setActive(best);
-      });
+    const stage = stageRef.current;
+    if (!stage) return;
+    const measure = () => {
+      const card = stage.querySelector(".ach-card-3d") as HTMLElement | null;
+      if (card && card.offsetWidth) setCardW(card.offsetWidth);
     };
-    track.addEventListener("scroll", recompute, { passive: true });
-    recompute();
-    return () => {
-      track.removeEventListener("scroll", recompute);
-      cancelAnimationFrame(raf);
-    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+    measure();
+    return () => ro.disconnect();
   }, [images.length]);
 
-  const scrollToIdx = useCallback(
-    (i: number) => {
-      const idx = Math.max(0, Math.min(i, images.length - 1));
-      const track = trackRef.current;
-      const card = cardRefs.current[idx];
-      if (!track || !card) return;
-      const target = card.offsetLeft - (track.clientWidth - card.clientWidth) / 2;
-      track.scrollTo({ left: target, behavior: reduce ? "auto" : "smooth" });
-      setActive(idx);
-    },
-    [images.length, reduce]
+  const go = useCallback(
+    (i: number) => setActive(Math.max(0, Math.min(i, images.length - 1))),
+    [images.length]
   );
-
-  // Center the first card once images are present (instant, no smooth scroll).
-  useEffect(() => {
-    const track = trackRef.current;
-    const card = cardRefs.current[0];
-    if (images.length > 0 && track && card) {
-      track.scrollTo({
-        left: card.offsetLeft - (track.clientWidth - card.clientWidth) / 2,
-        behavior: "auto",
-      });
-      setActive(0);
-    }
-  }, [images.length]);
+  const next = useCallback(() => go(active + 1), [active, go]);
+  const prev = useCallback(() => go(active - 1), [active, go]);
 
   // Lightbox keyboard nav
   useEffect(() => {
@@ -108,66 +72,87 @@ export default function AchievementsCarousel({
     );
   }
 
+  const step = cardW * 0.6;
+  const transition = reduce
+    ? { duration: 0 }
+    : { duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
+
   const safeLightboxIndex = Math.min(Math.max(activeIndex, 0), images.length - 1);
   const lightboxCaption = captionFor(images[safeLightboxIndex] ?? images[0]);
+  const activeCaption = captionFor(images[active]);
 
   return (
     <>
       <div
-        className="ach-carousel"
+        className="ach-coverflow"
         role="group"
         aria-roledescription="carousel"
         aria-label="Achievements"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            next();
+          }
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            prev();
+          }
+        }}
       >
-        <div
-          className="ach-track"
-          ref={trackRef}
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowRight") {
-              e.preventDefault();
-              scrollToIdx(active + 1);
-            }
-            if (e.key === "ArrowLeft") {
-              e.preventDefault();
-              scrollToIdx(active - 1);
-            }
-          }}
-        >
+        <div className="ach-stage" ref={stageRef}>
           {images.map((src, i) => {
+            const offset = i - active;
+            const abs = Math.abs(offset);
+            const hidden = abs > 2;
             const caption = captionFor(src);
-            const isActive = i === active;
+            const isActive = offset === 0;
             return (
-              <figure
+              <motion.div
                 key={src}
-                data-idx={i}
-                ref={(el) => {
-                  cardRefs.current[i] = el;
+                className="ach-card-3d"
+                data-hidden={hidden ? "true" : "false"}
+                initial={false}
+                animate={{
+                  x: offset * step,
+                  rotateY: isActive ? 0 : -offset * 38,
+                  z: -abs * 130,
+                  scale: Math.max(0.6, 1 - abs * 0.14),
+                  opacity: hidden ? 0 : 1 - abs * 0.22,
+                  zIndex: 100 - abs,
                 }}
-                className={`ach-card ${isActive ? "active" : ""}`}
+                transition={transition}
               >
                 <button
                   type="button"
                   className="ach-card-img"
-                  onClick={() => (isActive ? onOpen(i) : scrollToIdx(i))}
+                  onClick={() => (isActive ? onOpen(i) : go(i))}
                   aria-label={isActive ? `Open: ${caption}` : `Focus image ${i + 1}`}
+                  tabIndex={hidden ? -1 : 0}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={caption} draggable={false} />
                 </button>
-                <figcaption className="ach-caption">{caption}</figcaption>
-              </figure>
+              </motion.div>
             );
           })}
         </div>
 
-        <div className="ach-controls">
-          <button
-            className="ach-nav"
-            onClick={() => scrollToIdx(active - 1)}
-            disabled={active === 0}
-            aria-label="Previous"
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={active}
+            className="ach-coverflow-caption"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: reduce ? 0 : 0.2 }}
           >
+            {activeCaption}
+          </motion.p>
+        </AnimatePresence>
+
+        <div className="ach-controls">
+          <button className="ach-nav" onClick={prev} disabled={active === 0} aria-label="Previous">
             ‹
           </button>
           <div className="ach-dots" role="tablist">
@@ -175,7 +160,7 @@ export default function AchievementsCarousel({
               <button
                 key={i}
                 className={`ach-dot ${i === active ? "active" : ""}`}
-                onClick={() => scrollToIdx(i)}
+                onClick={() => go(i)}
                 aria-label={`Go to image ${i + 1}`}
                 aria-selected={i === active}
                 role="tab"
@@ -184,7 +169,7 @@ export default function AchievementsCarousel({
           </div>
           <button
             className="ach-nav"
-            onClick={() => scrollToIdx(active + 1)}
+            onClick={next}
             disabled={active === images.length - 1}
             aria-label="Next"
           >

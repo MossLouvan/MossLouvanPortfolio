@@ -11,6 +11,10 @@ export type Project = {
   tags: string[];
   visibility: "public" | "private";
   links: ProjectLink[];
+  /** cover image shown on the card */
+  cover?: string;
+  /** how the cover fills its frame (photos => cover, logos => contain) */
+  coverFit?: "cover" | "contain";
 };
 
 export const PROJECTS: Project[] = [
@@ -19,6 +23,8 @@ export const PROJECTS: Project[] = [
     title: "NASA South Pole Lunar Exploration App",
     role: "Lead Coder & Game Developer",
     timeframe: "Oct 2023 – Apr 2024",
+    cover: "/projects/nasa.jpg",
+    coverFit: "cover",
     blurb:
       "An AI-assisted lunar rover simulator built on real lunar south pole terrain constraints and mission-oriented exploration workflows.",
     bullets: [
@@ -37,6 +43,8 @@ export const PROJECTS: Project[] = [
     title: "Converge",
     role: "Full-Stack Developer · SwanHacks Spring 2026",
     timeframe: "May 2026",
+    cover: "/projects/converge.png",
+    coverFit: "cover",
     blurb:
       "An AI-powered lecture capture & study platform — records lectures, transcribes them live, and auto-generates notes, flashcards, and quizzes, with accessibility built in.",
     bullets: [
@@ -56,6 +64,8 @@ export const PROJECTS: Project[] = [
     title: "AI PDF Processing Platform",
     role: "Contracted AI Software Engineer · Principal Financial Group",
     timeframe: "Jun 2024 – Aug 2024",
+    cover: "/projects/principal.png",
+    coverFit: "contain",
     blurb:
       "An end-to-end AI platform that ingests PDFs, chunks + embeds content, and powers traceable RAG with evidence highlighting.",
     bullets: [
