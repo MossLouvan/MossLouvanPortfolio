@@ -67,9 +67,9 @@ body {
   line-height: 1.6;
 }
 
-/* ─── Theme switch: circular reveal via View Transitions ───────
-   Disable the default cross-fade so ThemeToggle's clip-path reveal
-   of the new theme shows cleanly over the old one. */
+/* ─── Theme switch: diagonal reveal via View Transitions ───────
+   Disable the default cross-fade so ThemeToggle's clip-path wipe
+   of the new theme shows cleanly over the held old one. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -354,12 +354,29 @@ body {
   color: var(--fg);
   cursor: pointer;
   padding: 0;
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.25s ease, color 0.4s ease;
+}
+
+/* Celestial accent — a warm sun by day, cool moonlight by night. */
+.theme-toggle[data-theme="light"] {
+  color: #ef9d24;
+}
+.theme-toggle[data-theme="dark"] {
+  color: #c2ccf0;
 }
 
 .theme-toggle:hover {
   background: var(--surface-3);
   border-color: var(--surface-border-strong);
+}
+.theme-toggle[data-theme="light"]:hover {
+  box-shadow: 0 0 0 1px rgba(239, 157, 36, 0.35),
+    0 6px 18px -8px rgba(239, 157, 36, 0.6);
+}
+.theme-toggle[data-theme="dark"]:hover {
+  box-shadow: 0 0 0 1px rgba(194, 204, 240, 0.3),
+    0 6px 18px -8px rgba(194, 204, 240, 0.5);
 }
 
 .theme-toggle:focus-visible {
@@ -367,9 +384,42 @@ body {
   outline-offset: 2px;
 }
 
-.theme-toggle-icon {
-  display: inline-flex;
-  line-height: 1;
+/* ── Morphing sun ⇄ moon (eclipse mask) ───────────────────── */
+.theme-toggle-svg {
+  overflow: visible;
+}
+
+.tt-cut {
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.theme-toggle[data-theme="light"] .tt-cut {
+  /* shadow pulled off the disc → a full sun */
+  transform: translate(8px, -8px);
+}
+.theme-toggle[data-theme="dark"] .tt-cut {
+  /* shadow slides over → a crescent moon */
+  transform: translate(0, 0);
+}
+
+.tt-rays {
+  transform-origin: 12px 12px;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s ease;
+}
+.theme-toggle[data-theme="light"] .tt-rays {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.theme-toggle[data-theme="dark"] .tt-rays {
+  opacity: 0;
+  transform: scale(0.35) rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-cut,
+  .tt-rays {
+    transition: none;
+  }
 }
 
 /* ─── Hero ────────────────────────────────────────────────── */

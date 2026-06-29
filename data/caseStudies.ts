@@ -149,9 +149,9 @@ export const CASE_STUDIES: CaseStudy[] = [
     subtitle: "Full-Stack Developer · SwanHacks Spring 2026 (Iowa State)",
     timeframe: "May 2026",
     flow: [
-      "Capture lecture audio (or upload a recording)",
-      "Transcribe live with Deepgram + Whisper",
-      "Generate notes, flashcards & quizzes (GPT-4o-mini)",
+      "Capture lecture audio — or upload a recording / PDF / Word doc",
+      "Transcribe on-device with local Whisper (no server round-trip)",
+      "Generate notes, flashcards, quizzes & study plans (LLM + RAG)",
       "Study with spaced repetition + accessibility tools",
     ],
     links: [
@@ -164,10 +164,11 @@ export const CASE_STUDIES: CaseStudy[] = [
       role:
         "Full-stack developer on a 4-person team. Built capture → transcript → study pipeline pieces, Canvas integration, and the accessibility layer.",
       solution:
-        "One AI-powered platform that captures lectures, transcribes them in real time, and auto-generates notes, flashcards, and quizzes — with deep accessibility built in from the start.",
+        "One AI-powered platform that captures lectures, transcribes them on-device, and auto-generates notes, flashcards, quizzes, and study plans — with deep accessibility built in from the start.",
       highlights: [
-        "Real-time captions via Deepgram (Nova-2) + batch transcription via OpenAI Whisper",
-        "Auto-generated notes, flashcards (SM-2 spaced repetition), and quizzes via GPT-4o-mini",
+        "In-browser transcription with local Whisper (transformers.js) — audio never leaves the device",
+        "Notes, flashcards (SM-2 spaced repetition), quizzes & study plans built from a RAG knowledge base",
+        "Pluggable LLM — local Ollama by default, with OpenAI / Gemini / OpenRouter presets",
         "ASL fingerspelling-to-text using fully client-side MediaPipe hand tracking",
         "Accessibility-first: text-to-speech, dyslexia-friendly fonts, reading ruler, focus mode",
         "Canvas LMS integration maps study materials to the right courses",
@@ -175,14 +176,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
     architecture: {
       nodes: [
-        { id: "capture", label: "Capture / Upload", desc: "Record lecture audio in the browser or upload a recording." },
+        { id: "capture", label: "Capture / Upload", desc: "Record lecture audio in the browser, or upload a recording, PDF, or Word doc." },
         { id: "asl", label: "ASL Input (MediaPipe)", desc: "Client-side hand tracking turns ASL fingerspelling into text." },
         { id: "canvas", label: "Canvas LMS", desc: "Pulls courses so study materials map to the right class." },
-        { id: "stt", label: "Speech-to-Text (Deepgram · Whisper)", desc: "Live Deepgram Nova-2 stream + batch Whisper transcription." },
+        { id: "stt", label: "Local Whisper (in-browser)", desc: "In-browser Whisper (transformers.js, whisper-tiny) transcribes audio in ~8s chunks — nothing leaves the device." },
         { id: "transcript", label: "Transcript", desc: "Unified, timestamped transcript that drives everything downstream." },
-        { id: "ai", label: "AI Pipeline (GPT-4o-mini)", desc: "Five-stage pipeline: clean up → notes → flashcards → quiz." },
-        { id: "store", label: "PocketBase", desc: "Backend + database the app is built on; persists lectures, transcripts, and study materials." },
-        { id: "study", label: "Notes · Flashcards · Quizzes", desc: "The study output — artifacts with SM-2 spaced repetition + Pomodoro sessions." },
+        { id: "ai", label: "AI Pipeline (LLM + RAG)", desc: "Pluggable LLM — Ollama by default, or OpenAI / Gemini / OpenRouter — over a chunked knowledge base: clean up → notes → flashcards → quizzes → study plans." },
+        { id: "store", label: "PocketBase", desc: "Backend + database the app is built on; persists lectures, transcripts, the knowledge base, and study materials." },
+        { id: "study", label: "Notes · Flashcards · Quizzes · Study plans", desc: "The study output — artifacts with SM-2 spaced repetition + Pomodoro sessions." },
       ],
       edges: [
         { from: "capture", to: "stt" },
