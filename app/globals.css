@@ -1180,19 +1180,19 @@ html:not(.dark) .typewriter-highlight {
 /* ─── Skills / Chips ──────────────────────────────────────── */
 .skills-grid {
   display: grid;
-  gap: 1.85rem;
+  gap: 2rem;
 }
 
 .skills-category {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .skills-title {
   font-size: 0.78rem;
   font-weight: 600;
-  margin: 0 0 0.85rem;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -1230,9 +1230,9 @@ html:not(.dark) .typewriter-highlight {
 /* ─── Skill logo tiles ────────────────────────────────────── */
 .skill-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
-  gap: 1rem 0.85rem;
-  margin-top: 0.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 112px));
+  justify-content: start;
+  gap: 1.2rem 1.1rem;
 }
 
 .skill-tile {
@@ -1240,13 +1240,15 @@ html:not(.dark) .typewriter-highlight {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 116px;
 }
 
 .skill-logo {
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
+  width: 66px;
+  height: 66px;
+  border-radius: 16px;
   /* white chip keeps brand colors true and black marks visible in both themes */
   background: #ffffff;
   border: 1px solid var(--surface-border);
@@ -1262,8 +1264,8 @@ html:not(.dark) .typewriter-highlight {
 }
 
 .skill-logo img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   display: block;
 }
@@ -1271,43 +1273,49 @@ html:not(.dark) .typewriter-highlight {
 .skill-monogram {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
   /* fixed dark chip — always legible on the white logo tile, both themes */
   background: #232634;
   color: #fff;
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   letter-spacing: 0.01em;
 }
 
 .skill-name {
-  font-size: 0.76rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 2.35em;
+  font-size: 0.78rem;
   color: var(--muted);
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.18;
+  text-wrap: balance;
 }
 
 /* Featured "Core Stack" tier — larger, shown first */
 .skills-category--core .skill-tiles {
-  grid-template-columns: repeat(auto-fill, minmax(102px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(104px, 124px));
+  gap: 1.25rem 1.2rem;
 }
 
 .skills-category--core .skill-logo {
-  width: 74px;
-  height: 74px;
+  width: 72px;
+  height: 72px;
   border-radius: 18px;
 }
 
 .skills-category--core .skill-logo img {
-  width: 44px;
-  height: 44px;
+  width: 43px;
+  height: 43px;
 }
 
 .skills-category--core .skill-monogram {
-  width: 46px;
-  height: 46px;
+  width: 45px;
+  height: 45px;
   border-radius: 12px;
   font-size: 0.86rem;
 }
