@@ -46,13 +46,13 @@ export const PROJECTS: Project[] = [
     cover: "/projects/converge.png",
     coverFit: "cover",
     blurb:
-      "An AI-powered lecture capture & study platform — records lectures, transcribes them live, and auto-generates notes, flashcards, and quizzes, with accessibility built in.",
+      "An AI-powered lecture capture & study platform — records lectures, transcribes them on-device, and auto-generates notes, flashcards, quizzes, and study plans, with accessibility built in.",
     bullets: [
-      "Live captions (Deepgram) + batch transcription (Whisper)",
-      "Auto notes, flashcards (SM-2), and quizzes via GPT-4o-mini",
+      "In-browser transcription with local Whisper — audio stays on-device",
+      "Notes, flashcards (SM-2), quizzes & study plans via LLM + RAG",
       "ASL fingerspelling input + deep accessibility features",
     ],
-    tags: ["React", "PocketBase", "Deepgram", "GPT-4o-mini", "MediaPipe"],
+    tags: ["React", "PocketBase", "Whisper", "RAG", "MediaPipe"],
     visibility: "public",
     links: [
       { label: "GitHub", href: "https://github.com/jackulau/SwanHacksSpring2026" },

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useId, useState } from "react";
+import { motion } from "framer-motion";
 
 type DocWithVT = Document & {
   startViewTransition?: (callback: () => void) => { ready: Promise<void> };
@@ -10,7 +10,7 @@ type DocWithVT = Document & {
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
   const [mounted, setMounted] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const maskId = useId();
 
   // Read whatever the pre-paint script already applied (saved choice or OS preference).
   useEffect(() => {
@@ -44,27 +44,21 @@ export default function ThemeToggle() {
       return;
     }
 
-    const rect = buttonRef.current?.getBoundingClientRect();
-    const x = rect ? rect.left + rect.width / 2 : window.innerWidth - 40;
-    const y = rect ? rect.top + rect.height / 2 : 40;
-    const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
-    );
-
     const transition = doc.startViewTransition(() => applyTheme(next));
     transition.ready
       .then(() => {
+        // New theme wipes in behind a 45° edge sweeping from the toggle's
+        // corner (top-right) to the bottom-left — cleaner than a circle.
         document.documentElement.animate(
           {
             clipPath: [
-              `circle(0px at ${x}px ${y}px)`,
-              `circle(${endRadius}px at ${x}px ${y}px)`,
+              "polygon(100% 0%, 100% 0%, 100% 0%, 100% 0%)",
+              "polygon(-120% 0%, 100% 0%, 100% 220%, 100% 220%)",
             ],
           },
           {
-            duration: 480,
-            easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+            duration: 520,
+            easing: "cubic-bezier(0.76, 0, 0.24, 1)",
             pseudoElement: "::view-transition-new(root)",
           }
         );
@@ -76,59 +70,54 @@ export default function ThemeToggle() {
 
   return (
     <motion.button
-      ref={buttonRef}
       type="button"
       className="theme-toggle"
+      data-theme={isDark ? "dark" : "light"}
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
-      whileTap={{ scale: 0.92 }}
+      whileTap={{ scale: 0.88 }}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={theme}
-          className="theme-toggle-icon"
-          initial={{ scale: 0.4, opacity: 0, rotate: -40 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          exit={{ scale: 0.4, opacity: 0, rotate: 40 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+      {/*
+        One disc that morphs: a masked "shadow" circle (.tt-cut) slides across to
+        carve a crescent for the moon, while the rays (.tt-rays) retract for night.
+        The morph itself is driven by CSS keyed on the button's data-theme.
+      */}
+      <svg
+        className="theme-toggle-svg"
+        width={18}
+        height={18}
+        viewBox="0 0 24 24"
+        aria-hidden
+      >
+        <mask id={maskId}>
+          <rect x="0" y="0" width="24" height="24" fill="white" />
+          <circle className="tt-cut" cx="16" cy="8" r="6" fill="black" />
+        </mask>
+        <circle
+          className="tt-disc"
+          cx="12"
+          cy="12"
+          r="6"
+          fill="currentColor"
+          mask={`url(#${maskId})`}
+        />
+        <g
+          className="tt-rays"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
         >
-          {isDark ? <MoonIcon size={16} /> : <SunIcon size={16} />}
-        </motion.span>
-      </AnimatePresence>
+          <line x1="12" y1="1" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="23" />
+          <line x1="1" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="23" y2="12" />
+          <line x1="4.1" y1="4.1" x2="6.2" y2="6.2" />
+          <line x1="17.8" y1="17.8" x2="19.9" y2="19.9" />
+          <line x1="4.1" y1="19.9" x2="6.2" y2="17.8" />
+          <line x1="17.8" y1="6.2" x2="19.9" y2="4.1" />
+        </g>
+      </svg>
     </motion.button>
-  );
-}
-
-function SunIcon({ size }: { size: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <line x1="12" y1="2" x2="12" y2="5" />
-      <line x1="12" y1="19" x2="12" y2="22" />
-      <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
-      <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
-      <line x1="2" y1="12" x2="5" y2="12" />
-      <line x1="19" y1="12" x2="22" y2="12" />
-      <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
-      <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
-    </svg>
-  );
-}
-
-function MoonIcon({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
   );
 }
