@@ -76,7 +76,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, active, filtered]);
 
   // click outside closes (scroll does not)

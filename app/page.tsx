@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import ThemeToggle from "@/components/ThemeToggle";
 import CollapsibleSection from "@/components/CollapsibleSection";
@@ -266,7 +267,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
                 >
-                  <img src="/profile/avatar.png" alt="Moss Louvan" />
+                  <Image src="/profile/avatar.png" alt="Moss Louvan" width={1024} height={1536} priority />
                 </motion.div>
 
                 <motion.p
