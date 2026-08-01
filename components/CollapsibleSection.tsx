@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { m } from "framer-motion";
 
 /**
@@ -11,8 +11,10 @@ import { m } from "framer-motion";
  * there is no per-frame JavaScript and no React re-render while it plays —
  * which matters because these sections wrap image grids and a 3D carousel.
  *
- * The body also stays mounted when collapsed, so in-page search and anchor
- * links still reach it. `inert` keeps it out of the tab order while hidden.
+ * The body stays mounted when collapsed so crawlers still index it, and
+ * `inert` keeps it out of the tab order and the accessibility tree while it is
+ * clipped to zero height. Note that `inert` also excludes it from find-in-page
+ * — collapsed copy is not reachable by Ctrl+F, same as when it was unmounted.
  */
 export default function CollapsibleSection({
   title,
@@ -26,6 +28,7 @@ export default function CollapsibleSection({
   id?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const contentId = useId();
 
   return (
     <m.section
@@ -36,25 +39,32 @@ export default function CollapsibleSection({
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <button
-        type="button"
-        className="section-header"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <h2 className="section-title">{title}</h2>
-        <m.span
-          className="section-toggle"
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          aria-hidden
+      {/* The button sits *inside* the heading, not the other way round: <h2> is
+          flow content and isn't valid inside <button>, and ARIA treats button
+          children as presentational — which would drop every section heading
+          out of screen-reader heading navigation. */}
+      <h2 className="section-title">
+        <button
+          type="button"
+          className="section-header"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls={contentId}
         >
-          ▼
-        </m.span>
-      </button>
+          <span>{title}</span>
+          <m.span
+            className="section-toggle"
+            animate={{ rotate: open ? 180 : 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            aria-hidden
+          >
+            ▼
+          </m.span>
+        </button>
+      </h2>
 
       <div className="section-collapse" data-open={open ? "true" : "false"}>
-        <div className="section-content" inert={!open}>
+        <div id={contentId} className="section-content" inert={!open}>
           {children}
         </div>
       </div>

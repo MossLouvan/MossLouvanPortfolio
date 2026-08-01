@@ -10,9 +10,12 @@ import { useCallback, useInsertionEffect, useRef } from "react";
  * — so the effect doesn't list them as dependencies and re-subscribe on every
  * parent render.
  *
- * This is the userland form of React's `useEffectEvent`; that hook exists in
- * React 19.2 but is not yet exported from the entry point bundlers resolve.
- * Swap this out once it is.
+ * This is the userland form of React's `useEffectEvent`. That hook is present
+ * on the CommonJS `react` build in 19.2.0, but it is NOT in the entry point
+ * Next bundles: importing it fails the build with
+ *   "Attempted import error: 'useEffectEvent' is not exported from 'react'"
+ * and the prerender then dies on "(0, e.useEffectEvent) is not a function".
+ * Swap this out once the bundler entry exports it.
  */
 export function useEvent<Args extends unknown[], R>(
   handler: (...args: Args) => R

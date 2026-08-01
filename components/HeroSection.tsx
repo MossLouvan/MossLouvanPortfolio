@@ -40,9 +40,9 @@ export default function HeroSection() {
               alt="Moss Louvan"
               width={840}
               height={1260}
-              // Without `sizes` the browser assumes full-viewport width and
-              // pulls the largest candidate; the avatar never exceeds 420px.
-              sizes="(max-width: 900px) 60vw, 420px"
+              // No `sizes`: with images.unoptimized Next emits no srcset, so
+              // there are no candidates to choose between. Kept as next/image
+              // for the `priority` LCP preload it still emits.
               priority
             />
           </m.div>

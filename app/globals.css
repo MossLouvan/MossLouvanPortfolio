@@ -108,6 +108,13 @@ body {
 }
 
 .cp-trigger {
+  /* Width animates natively. Framer's `layout` did this with scaleX, which
+     squashed the search icon to ~54% mid-transition. */
+  width: 184px;
+  transition:
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.18s ease,
+    border-color 0.18s ease;
   height: 36px;
   padding: 0 8px 0 12px;
   border-radius: 10px;
@@ -121,7 +128,6 @@ body {
   font-size: 0.88rem;
   overflow: hidden;
   flex-shrink: 0;
-  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .cp-trigger:hover {
@@ -137,6 +143,16 @@ body {
 .cp-icon {
   flex-shrink: 0;
   opacity: 0.6;
+}
+
+.cp-root[data-open="true"] .cp-trigger {
+  width: 340px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-trigger {
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
 }
 
 .cp-trigger-inner {
@@ -695,21 +711,22 @@ html:not(.dark) .typewriter-highlight {
 }
 
 .section-header {
-  /* It is a <button> so keyboard users can toggle it; strip the UA chrome
-     so it still reads as a plain section heading row. */
+  /* The toggle button fills its heading. UA chrome stripped so the row still
+     reads as a plain section heading. */
   width: 100%;
-  border: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  padding: 0;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
-  background: transparent;
 }
 
 .section-title {
@@ -729,7 +746,6 @@ html:not(.dark) .typewriter-highlight {
   color: var(--fg);
   font-size: 1.2rem;
   flex-shrink: 0;
-  margin-bottom: 2rem;
 }
 
 /* ─── Cards ───────────────────────────────────────────────── */

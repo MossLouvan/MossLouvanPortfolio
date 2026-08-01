@@ -55,7 +55,13 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     if (item.action) item.action();
     if (item.href) {
       if (item.href.startsWith("#")) {
-        window.location.hash = item.href;
+        // Not `location.hash = …`: that setter is a no-op when the fragment is
+        // already the current one, so picking two results in the same section
+        // (or the same result twice) would close the palette without moving.
+        // getElementById rather than querySelector — it takes a plain id, so a
+        // malformed href can't throw a SyntaxError.
+        document.getElementById(item.href.slice(1))?.scrollIntoView({ block: "start" });
+        window.history.replaceState(null, "", item.href);
       } else {
         // 'noopener' keeps the opened page from reaching back through
         // window.opener and redirecting this tab.
@@ -80,13 +86,16 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
       if (!open) return;
 
       if (e.key === "Escape") setOpen(false);
+      // Step from the *clamped* index. `active` itself can sit past the end of
+      // a freshly-filtered list, and decrementing that stale value would leave
+      // the highlight stuck until the user pressed ArrowUp enough times.
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActive((a) => Math.min(a + 1, filtered.length - 1));
+        setActive(Math.min(activeIndex + 1, filtered.length - 1));
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActive((a) => Math.max(0, a - 1));
+        setActive(Math.max(0, activeIndex - 1));
       }
       if (e.key === "Enter") {
         const item = filtered[activeIndex];
@@ -130,16 +139,15 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
 
   return (
     <div ref={rootRef} className="cp-root" data-open={open ? "true" : "false"}>
-      <m.button
-        layout
+      {/* Width is animated by a CSS transition keyed off .cp-root[data-open]
+          (see globals.css). Framer's `layout` would animate it with scaleX,
+          which visibly squashes the search icon and the border radius; an
+          `animate={{ width }}` prop would tick a layout property from JS every
+          frame. CSS does it natively with neither problem. */}
+      <button
         type="button"
         className="cp-trigger"
         onClick={() => setOpen((v) => !v)}
-        // `layout` + a plain style width: Framer animates the size change with
-        // transforms instead of ticking the `width` property, which would force
-        // a layout pass on the whole header every frame.
-        style={{ width: open ? 340 : 184 }}
-        transition={{ type: "spring", stiffness: 420, damping: 34 }}
         aria-label="Open search"
         aria-expanded={open}
       >
@@ -147,7 +155,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         <AnimatePresence initial={false}>
           {!open ? (
             <m.div
-              layout
               key="closed"
               className="cp-trigger-inner"
               initial={{ opacity: 0 }}
@@ -160,7 +167,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
             </m.div>
           ) : (
             <m.div
-              layout
               key="open"
               className="cp-input-wrap"
               initial={{ opacity: 0 }}
@@ -182,7 +188,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
             </m.div>
           )}
         </AnimatePresence>
-      </m.button>
+      </button>
 
       <AnimatePresence>
         {open && (

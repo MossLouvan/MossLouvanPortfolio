@@ -47,20 +47,28 @@ export default function Typewriter({
     onCompleteRef.current?.();
   }, [isComplete, text.length]);
 
-  // Any click or key press finishes the animation early. Listening on the
-  // document keeps the heading a plain <h1> — a clickable heading is
-  // unreachable for keyboard and screen-reader users.
+  // A click, or Escape, finishes the animation early. Listening on the document
+  // keeps the heading a plain <h1>: a clickable heading is unreachable for
+  // keyboard and screen-reader users.
+  //
+  // Deliberately `click` and not `pointerdown` — pointerdown fires at
+  // touch-start, before scroll intent is known, so the first swipe on a phone
+  // would skip the intro. Escape is the only key, so ⌘K, Tab and Space/PageDown
+  // scrolling all keep working normally.
   const onInteract = useEvent(() => skip());
+  const onKeyDown = useEvent((e: KeyboardEvent) => {
+    if (e.key === "Escape") skip();
+  });
 
   useEffect(() => {
     if (isComplete) return;
-    window.addEventListener("pointerdown", onInteract);
-    window.addEventListener("keydown", onInteract);
+    window.addEventListener("click", onInteract);
+    window.addEventListener("keydown", onKeyDown);
     return () => {
-      window.removeEventListener("pointerdown", onInteract);
-      window.removeEventListener("keydown", onInteract);
+      window.removeEventListener("click", onInteract);
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isComplete, onInteract]);
+  }, [isComplete, onInteract, onKeyDown]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -176,10 +184,10 @@ function buildHighlightedSpans(
 
     if (r.start > pos) {
       // Keyed by character offset — a stable identity even as text streams in.
-      nodes.push(<span key={`p${r.start}`}>{visibleText.slice(pos, r.start)}</span>);
+      nodes.push(<span key={`p${r.start}-${r.end}`}>{visibleText.slice(pos, r.start)}</span>);
     }
     nodes.push(
-      <span key={`h${r.start}`} className="typewriter-highlight">
+      <span key={`h${r.start}-${r.end}`} className="typewriter-highlight">
         {visibleText.slice(r.start, r.end)}
       </span>
     );

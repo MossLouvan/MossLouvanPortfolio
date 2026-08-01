@@ -10,8 +10,12 @@ import { useEvent } from "@/lib/useEvent";
 type Tab = "architecture" | "overview" | "impact";
 
 /**
- * Wrapper that gives the drawer a fresh identity per study, so React resets the
- * selected tab on open instead of an effect clearing it a frame late.
+ * Owns the presence animation. `AnimatePresence` has to live *above* the keyed
+ * panel: if the key changed on close, React would unmount the panel — and the
+ * AnimatePresence inside it — before the exit animation could play.
+ *
+ * Keying by slug alone still resets the panel's tab state when the visitor
+ * opens a different study, without disturbing the open/close transition.
  */
 export default function CaseStudyDrawer({
   open,
@@ -22,17 +26,21 @@ export default function CaseStudyDrawer({
   onClose: () => void;
   study: CaseStudy | null;
 }) {
-  return <CaseStudyDrawerPanel key={open ? study?.slug : "closed"} open={open} onClose={onClose} study={study} />;
+  return (
+    <AnimatePresence>
+      {open && study && (
+        <CaseStudyDrawerPanel key={study.slug} onClose={onClose} study={study} />
+      )}
+    </AnimatePresence>
+  );
 }
 
 function CaseStudyDrawerPanel({
-  open,
   onClose,
   study,
 }: {
-  open: boolean;
   onClose: () => void;
-  study: CaseStudy | null;
+  study: CaseStudy;
 }) {
   // Architecture is shown first by default.
   const [tab, setTab] = useState<Tab>("architecture");
@@ -41,8 +49,8 @@ function CaseStudyDrawerPanel({
   // re-subscribing whenever the parent hands down a new onClose.
   const handleClose = useEvent(() => onClose());
 
+  // The panel only exists while open, so this runs for exactly that lifetime.
   useEffect(() => {
-    if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleClose();
     };
@@ -53,11 +61,9 @@ function CaseStudyDrawerPanel({
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, handleClose]);
+  }, [handleClose]);
 
   return (
-    <AnimatePresence>
-      {open && study && (
         <m.div
           className="csd-overlay"
           initial={{ opacity: 0 }}
@@ -200,7 +206,5 @@ function CaseStudyDrawerPanel({
             </div>
           </m.aside>
         </m.div>
-      )}
-    </AnimatePresence>
   );
 }
