@@ -2,13 +2,7 @@
 
 import { m } from "framer-motion";
 
-export default function AnimatedCard({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) {
+export default function AnimatedCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <m.div
       className="card"

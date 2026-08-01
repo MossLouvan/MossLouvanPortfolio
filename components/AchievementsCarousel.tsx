@@ -71,9 +71,7 @@ export default function AchievementsCarousel({
   }, [lightboxOpen, onLightboxKey]);
 
   if (images.length === 0) {
-    return (
-      <p className="card-body">No images found. Add picture files to /public/achievements folder.</p>
-    );
+    return <p className="card-body">No images found. Add picture files to /public/achievements folder.</p>;
   }
 
   const step = cardW * 0.6;
@@ -139,13 +137,7 @@ export default function AchievementsCarousel({
                   tabIndex={hidden ? -1 : 0}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={caption}
-                    draggable={false}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <img src={src} alt={caption} draggable={false} loading="lazy" decoding="async" />
                 </button>
               </m.div>
             );
@@ -221,12 +213,7 @@ export default function AchievementsCarousel({
                 ›
               </button>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="lightbox-img"
-                src={images[safeLightboxIndex]}
-                alt={lightboxCaption}
-                decoding="async"
-              />
+              <img className="lightbox-img" src={images[safeLightboxIndex]} alt={lightboxCaption} decoding="async" />
               <div className="lightbox-caption">
                 <div className="lightbox-text">{lightboxCaption}</div>
               </div>

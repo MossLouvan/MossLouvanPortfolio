@@ -35,8 +35,7 @@ export default function ThemeToggle() {
 
   const toggleTheme = () => {
     const next: "light" | "dark" = isDark ? "light" : "dark";
-    const prefersReduced =
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const doc = document as DocWithVT;
 
     if (prefersReduced || !doc.startViewTransition) {
@@ -83,31 +82,13 @@ export default function ThemeToggle() {
         carve a crescent for the moon, while the rays (.tt-rays) retract for night.
         The morph itself is driven by CSS keyed on the button's data-theme.
       */}
-      <svg
-        className="theme-toggle-svg"
-        width={18}
-        height={18}
-        viewBox="0 0 24 24"
-        aria-hidden
-      >
+      <svg className="theme-toggle-svg" width={18} height={18} viewBox="0 0 24 24" aria-hidden>
         <mask id={maskId}>
           <rect x="0" y="0" width="24" height="24" fill="white" />
           <circle className="tt-cut" cx="16" cy="8" r="6" fill="black" />
         </mask>
-        <circle
-          className="tt-disc"
-          cx="12"
-          cy="12"
-          r="6"
-          fill="currentColor"
-          mask={`url(#${maskId})`}
-        />
-        <g
-          className="tt-rays"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        >
+        <circle className="tt-disc" cx="12" cy="12" r="6" fill="currentColor" mask={`url(#${maskId})`} />
+        <g className="tt-rays" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
           <line x1="12" y1="1" x2="12" y2="4" />
           <line x1="12" y1="20" x2="12" y2="23" />
           <line x1="1" y1="12" x2="4" y2="12" />

@@ -44,10 +44,7 @@ export default function SkillsGrid() {
   return (
     <div ref={ref} className="skills-grid">
       {SKILL_CATEGORIES.map((cat) => (
-        <div
-          key={cat.title}
-          className={`skills-category${cat.featured ? " skills-category--core" : ""}`}
-        >
+        <div key={cat.title} className={`skills-category${cat.featured ? " skills-category--core" : ""}`}>
           <h3 className="skills-title">{cat.title}</h3>
           <div className="skill-tiles">
             {cat.skills.map((skill, i) => (

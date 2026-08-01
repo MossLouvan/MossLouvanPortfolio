@@ -32,9 +32,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     if (!q) return commands.filter((c) => c.suggested);
 
     return commands.filter((c) => {
-      const hay = [c.label, c.group ?? "", c.meta ?? "", ...(c.keywords ?? []), c.href ?? ""]
-        .join(" ")
-        .toLowerCase();
+      const hay = [c.label, c.group ?? "", c.meta ?? "", ...(c.keywords ?? []), c.href ?? ""].join(" ").toLowerCase();
       return hay.includes(q);
     });
   }, [commands, query]);

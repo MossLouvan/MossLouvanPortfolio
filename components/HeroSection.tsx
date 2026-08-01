@@ -53,8 +53,8 @@ export default function HeroSection() {
             animate={typingDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             transition={{ duration: 0.5 }}
           >
-            Full-stack engineer specializing in AI systems, infrastructure, and developer tools. Based in Des
-            Moines, IA.
+            Full-stack engineer specializing in AI systems, infrastructure, and developer tools. Based in Des Moines,
+            IA.
           </m.p>
         </div>
 

@@ -6,8 +6,7 @@ import MotionProvider from "@/components/MotionProvider";
 
 export const metadata: Metadata = {
   title: "Moss Louvan | Software Engineer",
-  description:
-    "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.",
+  description: "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.",
 };
 
 export const viewport: Viewport = {

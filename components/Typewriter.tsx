@@ -144,18 +144,16 @@ export default function Typewriter({
       )}
       {rendered}
       {started && cursorVisible && (
-        <span className="typewriter-cursor" aria-hidden="true">|</span>
+        <span className="typewriter-cursor" aria-hidden="true">
+          |
+        </span>
       )}
       <span className="sr-only">{text}</span>
     </h1>
   );
 }
 
-function buildHighlightedSpans(
-  fullText: string,
-  visibleText: string,
-  highlights: string[]
-): React.ReactNode[] {
+function buildHighlightedSpans(fullText: string, visibleText: string, highlights: string[]): React.ReactNode[] {
   const visibleLen = visibleText.length;
 
   // Find highlight ranges within the visible portion
@@ -181,7 +179,6 @@ function buildHighlightedSpans(
   const nodes: React.ReactNode[] = [];
   let pos = 0;
   for (const r of ranges) {
-
     if (r.start > pos) {
       // Keyed by character offset — a stable identity even as text streams in.
       nodes.push(<span key={`p${r.start}-${r.end}`}>{visibleText.slice(pos, r.start)}</span>);

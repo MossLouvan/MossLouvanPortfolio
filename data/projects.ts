@@ -34,9 +34,7 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["Game Dev", "AI", "Simulation", "Geospatial"],
     visibility: "private",
-    links: [
-      { label: "Email me about it", href: "mailto:mosslouvan67@gmail.com?subject=NASA%20Case%20Study" },
-    ],
+    links: [{ label: "Email me about it", href: "mailto:mosslouvan67@gmail.com?subject=NASA%20Case%20Study" }],
   },
   {
     slug: "converge",
@@ -75,8 +73,6 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["RAG", "AWS Bedrock", "Python", "Vector Search"],
     visibility: "private",
-    links: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" },
-    ],
+    links: [{ label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" }],
   },
 ];

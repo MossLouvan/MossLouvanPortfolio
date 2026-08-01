@@ -3,21 +3,21 @@ import { CASE_STUDIES } from "@/data/caseStudies";
 import { ALL_SKILLS } from "@/data/skills";
 
 /** Sections reachable from the sidebar and the palette's "Navigation" group. */
-export const NAV_SECTIONS = [
-  "About",
-  "Experience",
-  "Projects",
-  "Achievements",
-  "Leadership",
-  "Skills",
-] as const;
+export const NAV_SECTIONS = ["About", "Experience", "Projects", "Achievements", "Leadership", "Skills"] as const;
 
 const NAV: CommandItem[] = [
   { id: "nav-about", group: "Navigation", label: "About", href: "#about", meta: "Section", suggested: true },
   { id: "nav-exp", group: "Navigation", label: "Experience", href: "#experience", meta: "Section", suggested: true },
   { id: "nav-edu", group: "Navigation", label: "Education", href: "#education", meta: "Section", suggested: true },
   { id: "nav-proj", group: "Navigation", label: "Projects", href: "#projects", meta: "Section", suggested: true },
-  { id: "nav-ach", group: "Navigation", label: "Achievements", href: "#achievements", meta: "Section", suggested: true },
+  {
+    id: "nav-ach",
+    group: "Navigation",
+    label: "Achievements",
+    href: "#achievements",
+    meta: "Section",
+    suggested: true,
+  },
   { id: "nav-lead", group: "Navigation", label: "Leadership", href: "#leadership", meta: "Section", suggested: true },
   { id: "nav-skill", group: "Navigation", label: "Skills", href: "#skills", meta: "Section", suggested: true },
 ];

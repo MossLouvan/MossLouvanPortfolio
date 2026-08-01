@@ -17,9 +17,7 @@ import { useCallback, useInsertionEffect, useRef } from "react";
  * and the prerender then dies on "(0, e.useEffectEvent) is not a function".
  * Swap this out once the bundler entry exports it.
  */
-export function useEvent<Args extends unknown[], R>(
-  handler: (...args: Args) => R
-): (...args: Args) => R {
+export function useEvent<Args extends unknown[], R>(handler: (...args: Args) => R): (...args: Args) => R {
   const ref = useRef(handler);
 
   // Written after commit, never during render (React may discard render work),
