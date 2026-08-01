@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { CASE_STUDIES } from "@/data/caseStudies";
 import type { Project } from "@/data/projects";
 import LinkIcon from "@/components/LinkIcon";
@@ -17,7 +17,7 @@ export default function ProjectCard({
   const caseStudy = CASE_STUDIES.find((s) => s.slug === project.slug);
 
   return (
-    <motion.article
+    <m.article
       className="project-card"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -40,6 +40,7 @@ export default function ProjectCard({
             className="project-cover-img"
             data-fit={project.coverFit ?? "cover"}
             loading="lazy"
+            decoding="async"
           />
         </button>
       )}
@@ -83,6 +84,6 @@ export default function ProjectCard({
           </a>
         ))}
       </div>
-    </motion.article>
+    </m.article>
   );
 }

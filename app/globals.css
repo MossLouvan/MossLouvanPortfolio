@@ -11,16 +11,23 @@
   --border: #e5e7eb;
 
   /* Surfaces — used by every overlay so it converges with the page theme */
-  --surface: #ffffff;            /* opaque panels: search, drawer, lightbox */
-  --surface-2: #f1efea;          /* subtle gray fill: inputs, tiles, chips */
-  --surface-3: #e9e6df;          /* hover/active fill */
-  --surface-border: rgba(0, 0, 0, 0.10);
+  --surface: #ffffff; /* opaque panels: search, drawer, lightbox */
+  --surface-2: #f1efea; /* subtle gray fill: inputs, tiles, chips */
+  --surface-3: #e9e6df; /* hover/active fill */
+  --surface-border: rgba(0, 0, 0, 0.1);
   --surface-border-strong: rgba(0, 0, 0, 0.18);
-  --overlay: rgba(20, 16, 12, 0.32);   /* modal backdrop */
+  --overlay: rgba(20, 16, 12, 0.32); /* modal backdrop */
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
-  --ring: rgba(0, 0, 0, 0.55);          /* focus ring */
-  --accent: #2f6df0;                    /* sparing accent: focus/active */
+  --ring: rgba(0, 0, 0, 0.55); /* focus ring */
+  --accent: #2f6df0; /* sparing accent: focus/active */
   --accent-soft: rgba(47, 109, 240, 0.12);
+  --header-bg: rgba(250, 248, 245, 0.92);
+  --fg-fill-soft: rgba(42, 42, 42, 0.06);
+  --fg-border-soft: rgba(42, 42, 42, 0.25);
+  --fg-shadow-soft: rgba(42, 42, 42, 0.6);
+  --fg-text-82: rgba(42, 42, 42, 0.82);
+  --fg-text-80: rgba(42, 42, 42, 0.8);
+  --fg-text-78: rgba(42, 42, 42, 0.78);
 
   /* Architecture diagram tokens */
   --diagram-grid: rgba(0, 0, 0, 0.05);
@@ -46,9 +53,16 @@ html.dark {
   --ring: rgba(255, 255, 255, 0.7);
   --accent: #7bb5ff;
   --accent-soft: rgba(123, 181, 255, 0.16);
+  --header-bg: rgba(26, 26, 26, 0.92);
+  --fg-fill-soft: rgba(245, 245, 245, 0.06);
+  --fg-border-soft: rgba(245, 245, 245, 0.25);
+  --fg-shadow-soft: rgba(245, 245, 245, 0.6);
+  --fg-text-82: rgba(245, 245, 245, 0.82);
+  --fg-text-80: rgba(245, 245, 245, 0.8);
+  --fg-text-78: rgba(245, 245, 245, 0.78);
 
   --diagram-grid: rgba(255, 255, 255, 0.06);
-  --diagram-stroke: rgba(255, 255, 255, 0.30);
+  --diagram-stroke: rgba(255, 255, 255, 0.3);
   --diagram-node: rgba(255, 255, 255, 0.06);
   --diagram-node-border: rgba(255, 255, 255, 0.16);
   --diagram-text: rgba(255, 255, 255, 0.92);
@@ -94,6 +108,13 @@ body {
 }
 
 .cp-trigger {
+  /* Width animates natively. Framer's `layout` did this with scaleX, which
+     squashed the search icon to ~54% mid-transition. */
+  width: 184px;
+  transition:
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.18s ease,
+    border-color 0.18s ease;
   height: 36px;
   padding: 0 8px 0 12px;
   border-radius: 10px;
@@ -107,7 +128,6 @@ body {
   font-size: 0.88rem;
   overflow: hidden;
   flex-shrink: 0;
-  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .cp-trigger:hover {
@@ -123,6 +143,18 @@ body {
 .cp-icon {
   flex-shrink: 0;
   opacity: 0.6;
+}
+
+.cp-root[data-open="true"] .cp-trigger {
+  width: 340px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-trigger {
+    transition:
+      background 0.18s ease,
+      border-color 0.18s ease;
+  }
 }
 
 .cp-trigger-inner {
@@ -270,6 +302,7 @@ body {
 
 /* Optional: make boxes feel draggable/inspectable */
 .diagram-box {
+  -webkit-user-select: none;
   user-select: none;
 }
 /* Main layout */
@@ -297,8 +330,9 @@ body {
   align-items: center;
   z-index: 100;
   height: auto;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  background: var(--header-bg);
 }
 
 .profile-card {
@@ -354,8 +388,11 @@ body {
   color: var(--fg);
   cursor: pointer;
   padding: 0;
-  transition: background 0.18s ease, border-color 0.18s ease,
-    box-shadow 0.25s ease, color 0.4s ease;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.25s ease,
+    color 0.4s ease;
 }
 
 /* Celestial accent — a warm sun by day, cool moonlight by night. */
@@ -371,11 +408,13 @@ body {
   border-color: var(--surface-border-strong);
 }
 .theme-toggle[data-theme="light"]:hover {
-  box-shadow: 0 0 0 1px rgba(239, 157, 36, 0.35),
+  box-shadow:
+    0 0 0 1px rgba(239, 157, 36, 0.35),
     0 6px 18px -8px rgba(239, 157, 36, 0.6);
 }
 .theme-toggle[data-theme="dark"]:hover {
-  box-shadow: 0 0 0 1px rgba(194, 204, 240, 0.3),
+  box-shadow:
+    0 0 0 1px rgba(194, 204, 240, 0.3),
     0 6px 18px -8px rgba(194, 204, 240, 0.5);
 }
 
@@ -403,7 +442,8 @@ body {
 
 .tt-rays {
   transform-origin: 12px 12px;
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.3s ease;
 }
 .theme-toggle[data-theme="light"] .tt-rays {
@@ -496,8 +536,13 @@ body {
 }
 
 @keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Loading dots before typing starts */
@@ -522,8 +567,16 @@ body {
 }
 
 @keyframes dot-bounce {
-  0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
-  40% { opacity: 1; transform: translateY(-6px); }
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
 }
 
 /* Highlight glow on key phrases */
@@ -574,7 +627,9 @@ html:not(.dark) .typewriter-highlight {
   text-decoration: none;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
   border-radius: 0.25rem;
   display: inline-flex;
   align-items: center;
@@ -612,8 +667,8 @@ html:not(.dark) .typewriter-highlight {
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--fg);
-  background: color-mix(in srgb, var(--fg) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+  background: var(--fg-fill-soft);
+  border: 1px solid var(--fg-border-soft);
   border-radius: 999px;
   cursor: pointer;
   transition:
@@ -627,7 +682,7 @@ html:not(.dark) .typewriter-highlight {
   background: var(--fg);
   border-color: var(--fg);
   color: var(--bg);
-  box-shadow: 0 6px 20px -8px color-mix(in srgb, var(--fg) 60%, transparent);
+  box-shadow: 0 6px 20px -8px var(--fg-shadow-soft);
 }
 
 .btn-case-study:focus-visible {
@@ -651,14 +706,50 @@ html:not(.dark) .typewriter-highlight {
   background: transparent;
 }
 
+/* Collapse driven by grid-template-rows so the browser interpolates it
+   natively — no JS ticking `height` and no React render per frame. */
+.section-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.35s ease,
+    opacity 0.25s ease;
+  opacity: 0;
+}
+
+.section-collapse[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.section-content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-collapse {
+    transition: none;
+  }
+}
+
 .section-header {
-  padding: 0;
-  cursor: pointer;
+  /* The toggle button fills its heading. UA chrome stripped so the row still
+     reads as a plain section heading. */
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  user-select: none;
+  border: none;
   background: transparent;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .section-title {
@@ -678,7 +769,6 @@ html:not(.dark) .typewriter-highlight {
   color: var(--fg);
   font-size: 1.2rem;
   flex-shrink: 0;
-  margin-bottom: 2rem;
 }
 
 /* ─── Cards ───────────────────────────────────────────────── */
@@ -724,7 +814,9 @@ html:not(.dark) .typewriter-highlight {
   background: var(--surface-2);
   padding: 0;
   cursor: pointer;
-  transition: border-color 0.18s ease, transform 0.18s ease;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease;
 }
 
 .project-cover:hover {
@@ -803,7 +895,7 @@ html:not(.dark) .typewriter-highlight {
   font-size: 0.88rem;
   line-height: 1.4;
   padding-top: 2px;
-  color: color-mix(in srgb, var(--fg) 82%, transparent);
+  color: var(--fg-text-82);
 }
 
 .csd-flow {
@@ -840,7 +932,7 @@ html:not(.dark) .typewriter-highlight {
 .project-blurb {
   margin: 0;
   font-size: 0.95rem;
-  color: color-mix(in srgb, var(--fg) 80%, transparent);
+  color: var(--fg-text-80);
   line-height: 1.6;
 }
 
@@ -876,7 +968,9 @@ html:not(.dark) .typewriter-highlight {
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .project-cta:hover {
@@ -895,7 +989,10 @@ html:not(.dark) .typewriter-highlight {
   color: var(--fg);
   font-size: 0.85rem;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .project-link:hover {
@@ -1142,7 +1239,10 @@ html:not(.dark) .typewriter-highlight {
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .ach-nav:hover:not(:disabled) {
@@ -1169,7 +1269,9 @@ html:not(.dark) .typewriter-highlight {
   padding: 0;
   background: var(--surface-3);
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .ach-dot.active {
@@ -1217,7 +1319,10 @@ html:not(.dark) .typewriter-highlight {
   color: var(--fg);
   border-radius: 2rem;
   cursor: default;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
   display: inline-block;
 }
 
@@ -1255,7 +1360,9 @@ html:not(.dark) .typewriter-highlight {
   display: grid;
   place-items: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .skill-tile:hover .skill-logo {
@@ -1293,7 +1400,6 @@ html:not(.dark) .typewriter-highlight {
   color: var(--muted);
   text-align: center;
   line-height: 1.18;
-  text-wrap: balance;
 }
 
 /* Featured "Core Stack" tier — larger, shown first */
@@ -1343,7 +1449,9 @@ html:not(.dark) .typewriter-highlight {
   font-size: 0.72rem;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.16s ease, transform 0.16s ease;
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
 }
 
 .skill-tile:hover .skill-used {
@@ -1379,6 +1487,7 @@ html:not(.dark) .typewriter-highlight {
   inset: 0;
   z-index: 9999;
   background: rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   display: grid;
   place-items: center;
@@ -1431,6 +1540,7 @@ html:not(.dark) .typewriter-highlight {
   padding: 8px 10px;
   border-radius: 12px;
   cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
@@ -1448,6 +1558,7 @@ html:not(.dark) .typewriter-highlight {
   font-size: 26px;
   display: grid;
   place-items: center;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
@@ -1464,6 +1575,7 @@ html:not(.dark) .typewriter-highlight {
   inset: 0;
   z-index: 9998;
   background: var(--overlay);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
@@ -1529,7 +1641,10 @@ html:not(.dark) .typewriter-highlight {
   border-radius: 999px;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .csd-tab:hover {
@@ -1557,7 +1672,7 @@ html:not(.dark) .typewriter-highlight {
 
 .csd-section p,
 .csd-section li {
-  color: color-mix(in srgb, var(--fg) 78%, transparent);
+  color: var(--fg-text-78);
   font-size: 0.92rem;
   line-height: 1.65;
 }
@@ -1586,7 +1701,10 @@ html:not(.dark) .typewriter-highlight {
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 500;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .csd-link:hover {
@@ -1655,6 +1773,7 @@ html:not(.dark) .typewriter-highlight {
   color: var(--diagram-text);
   font-family: inherit;
   pointer-events: none; /* let drags hit the node group, not the label */
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -1693,7 +1812,7 @@ html:not(.dark) .typewriter-highlight {
   .hero-banner {
     padding: 3rem 2rem;
     margin-top: 140px;
-    min-height: auto;
+    min-height: 0;
   }
 
   .hero-inner {

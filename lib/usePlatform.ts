@@ -26,9 +26,3 @@ export function usePlatform(): { isApple: boolean | null } {
 
   return { isApple };
 }
-
-/** Convenience: the modifier glyph for the current platform. */
-export function modKeyLabel(isApple: boolean | null): string {
-  // Default to "Ctrl" until known so Windows/Linux (the majority) never see a wrong ⌘.
-  return isApple ? "⌘" : "Ctrl";
-}

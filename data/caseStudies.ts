@@ -50,24 +50,39 @@ export const CASE_STUDIES: CaseStudy[] = [
     overview: {
       problem:
         "Build a lunar exploration experience that uses real geospatial constraints and communicates technical decisions clearly to judges.",
-      role:
-        "Led core development and integration. Built the app experience, coordinated engineering tasks, and ensured competition requirements were met.",
+      role: "Led core development and integration. Built the app experience, coordinated engineering tasks, and ensured competition requirements were met.",
       solution:
         "Shipped an AI-assisted rover exploration simulator grounded in real lunar south pole data, designed for clarity, reliability, and a strong demo narrative.",
       highlights: [
         "National 2024 NASA App Development Challenge winner",
         "Designed the core experience to be demo-ready and judge-friendly",
         "Built with a focus on reliability under live presentation conditions",
-        "Won out of over 100 teams nationwide, with a large field of strong competitors"
+        "Won out of over 100 teams nationwide, with a large field of strong competitors",
       ],
     },
     architecture: {
       nodes: [
         { id: "csv", label: "Elevation CSV", desc: "A single CSV of real lunar south-pole elevation data." },
-        { id: "heightmap", label: "Heightmap (Python)", desc: "Python converts the height data into a terrain heightmap." },
-        { id: "region", label: "Region Research", desc: "Analysis of the best area to explore; picks optimal start & end points." },
-        { id: "scene", label: "3D Scene + Rover", desc: "A 3D-modeled rover and a traversable scene built from the heightmap." },
-        { id: "astar", label: "A* Path Planner", desc: "A* search with weighted costs that constrain slope and sun visibility." },
+        {
+          id: "heightmap",
+          label: "Heightmap (Python)",
+          desc: "Python converts the height data into a terrain heightmap.",
+        },
+        {
+          id: "region",
+          label: "Region Research",
+          desc: "Analysis of the best area to explore; picks optimal start & end points.",
+        },
+        {
+          id: "scene",
+          label: "3D Scene + Rover",
+          desc: "A 3D-modeled rover and a traversable scene built from the heightmap.",
+        },
+        {
+          id: "astar",
+          label: "A* Path Planner",
+          desc: "A* search with weighted costs that constrain slope and sun visibility.",
+        },
         { id: "sim", label: "Rover Simulator", desc: "The rover traverses the optimal route through the 3D scene." },
       ],
       edges: [
@@ -100,21 +115,18 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Store vectors for fast semantic retrieval",
       "Answer questions with highlighted source evidence",
     ],
-    links: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" },
-    ],
+    links: [{ label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" }],
     overview: {
       problem:
         "Speed up understanding of dense PDFs while keeping answers traceable and enterprise-friendly (people need to trust the output).",
-      role:
-        "Built the full-stack platform: ingestion, chunking, retrieval, and UI experience for citations / highlighting.",
+      role: "Built the full-stack platform: ingestion, chunking, retrieval, and UI experience for citations / highlighting.",
       solution:
         "Implemented a RAG PDF assistant with transparent chunk highlighting and production-minded UX for fast navigation + verification.",
       highlights: [
         "Built end-to-end platform (ingest → retrieve → answer → highlight evidence)",
         "Designed for traceability and stakeholder trust by keeping the human in the loop",
         "Presented to senior engineers/executives (including CEO visibility)",
-        "Reduced reliance on third party vendors costing 500k+/year"
+        "Reduced reliance on third party vendors costing 500k+/year",
       ],
     },
     architecture: {
@@ -161,8 +173,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     overview: {
       problem:
         "Students juggle Otter.ai, Notion, Quizlet, Anki and their calendar to keep up with lectures — and accessibility is usually an afterthought.",
-      role:
-        "Full-stack developer on a 4-person team. Built capture → transcript → study pipeline pieces, Canvas integration, and the accessibility layer.",
+      role: "Full-stack developer on a 4-person team. Built capture → transcript → study pipeline pieces, Canvas integration, and the accessibility layer.",
       solution:
         "One AI-powered platform that captures lectures, transcribes them on-device, and auto-generates notes, flashcards, quizzes, and study plans — with deep accessibility built in from the start.",
       highlights: [
@@ -176,14 +187,42 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
     architecture: {
       nodes: [
-        { id: "capture", label: "Capture / Upload", desc: "Record lecture audio in the browser, or upload a recording, PDF, or Word doc." },
-        { id: "asl", label: "ASL Input (MediaPipe)", desc: "Client-side hand tracking turns ASL fingerspelling into text." },
+        {
+          id: "capture",
+          label: "Capture / Upload",
+          desc: "Record lecture audio in the browser, or upload a recording, PDF, or Word doc.",
+        },
+        {
+          id: "asl",
+          label: "ASL Input (MediaPipe)",
+          desc: "Client-side hand tracking turns ASL fingerspelling into text.",
+        },
         { id: "canvas", label: "Canvas LMS", desc: "Pulls courses so study materials map to the right class." },
-        { id: "stt", label: "Local Whisper (in-browser)", desc: "In-browser Whisper (transformers.js, whisper-tiny) transcribes audio in ~8s chunks — nothing leaves the device." },
-        { id: "transcript", label: "Transcript", desc: "Unified, timestamped transcript that drives everything downstream." },
-        { id: "ai", label: "AI Pipeline (LLM + RAG)", desc: "Pluggable LLM — Ollama by default, or OpenAI / Gemini / OpenRouter — over a chunked knowledge base: clean up → notes → flashcards → quizzes → study plans." },
-        { id: "store", label: "PocketBase", desc: "Backend + database the app is built on; persists lectures, transcripts, the knowledge base, and study materials." },
-        { id: "study", label: "Notes · Flashcards · Quizzes · Study plans", desc: "The study output — artifacts with SM-2 spaced repetition + Pomodoro sessions." },
+        {
+          id: "stt",
+          label: "Local Whisper (in-browser)",
+          desc: "In-browser Whisper (transformers.js, whisper-tiny) transcribes audio in ~8s chunks — nothing leaves the device.",
+        },
+        {
+          id: "transcript",
+          label: "Transcript",
+          desc: "Unified, timestamped transcript that drives everything downstream.",
+        },
+        {
+          id: "ai",
+          label: "AI Pipeline (LLM + RAG)",
+          desc: "Pluggable LLM — Ollama by default, or OpenAI / Gemini / OpenRouter — over a chunked knowledge base: clean up → notes → flashcards → quizzes → study plans.",
+        },
+        {
+          id: "store",
+          label: "PocketBase",
+          desc: "Backend + database the app is built on; persists lectures, transcripts, the knowledge base, and study materials.",
+        },
+        {
+          id: "study",
+          label: "Notes · Flashcards · Quizzes · Study plans",
+          desc: "The study output — artifacts with SM-2 spaced repetition + Pomodoro sessions.",
+        },
       ],
       edges: [
         { from: "capture", to: "stt" },

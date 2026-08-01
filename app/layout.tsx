@@ -2,11 +2,11 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { ReactNode } from "react";
+import MotionProvider from "@/components/MotionProvider";
 
 export const metadata: Metadata = {
   title: "Moss Louvan | Software Engineer",
-  description:
-    "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.",
+  description: "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.",
 };
 
 export const viewport: Viewport = {
@@ -36,7 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

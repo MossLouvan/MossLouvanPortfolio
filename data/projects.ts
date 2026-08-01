@@ -23,7 +23,7 @@ export const PROJECTS: Project[] = [
     title: "NASA South Pole Lunar Exploration App",
     role: "Lead Coder & Game Developer",
     timeframe: "Oct 2023 – Apr 2024",
-    cover: "/projects/nasa.jpg",
+    cover: "/projects/nasa.webp",
     coverFit: "cover",
     blurb:
       "An AI-assisted lunar rover simulator built on real lunar south pole terrain constraints and mission-oriented exploration workflows.",
@@ -34,16 +34,14 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["Game Dev", "AI", "Simulation", "Geospatial"],
     visibility: "private",
-    links: [
-      { label: "Email me about it", href: "mailto:mosslouvan67@gmail.com?subject=NASA%20Case%20Study" },
-    ],
+    links: [{ label: "Email me about it", href: "mailto:mosslouvan67@gmail.com?subject=NASA%20Case%20Study" }],
   },
   {
     slug: "converge",
     title: "Converge",
     role: "Full-Stack Developer · SwanHacks Spring 2026",
     timeframe: "May 2026",
-    cover: "/projects/converge.png",
+    cover: "/projects/converge.webp",
     coverFit: "cover",
     blurb:
       "An AI-powered lecture capture & study platform — records lectures, transcribes them on-device, and auto-generates notes, flashcards, quizzes, and study plans, with accessibility built in.",
@@ -64,7 +62,7 @@ export const PROJECTS: Project[] = [
     title: "AI PDF Processing Platform",
     role: "Contracted AI Software Engineer · Principal Financial Group",
     timeframe: "Jun 2024 – Aug 2024",
-    cover: "/projects/principal.png",
+    cover: "/projects/principal.webp",
     coverFit: "contain",
     blurb:
       "An end-to-end AI platform that ingests PDFs, chunks + embeds content, and powers traceable RAG with evidence highlighting.",
@@ -75,8 +73,6 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["RAG", "AWS Bedrock", "Python", "Vector Search"],
     visibility: "private",
-    links: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" },
-    ],
+    links: [{ label: "LinkedIn", href: "https://www.linkedin.com/in/moss-louvan-4614682a4/" }],
   },
 ];

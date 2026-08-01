@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useEvent } from "@/lib/useEvent";
 
 interface TypewriterProps {
   text: string;
@@ -30,7 +31,12 @@ export default function Typewriter({
   const [cursorVisible, setCursorVisible] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+
+  // Written in an effect, not during render: React may replay or discard a
+  // render, and a mutation from discarded work would leak.
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const skip = useCallback(() => {
     if (isComplete) return;
@@ -40,6 +46,29 @@ export default function Typewriter({
     setIsComplete(true);
     onCompleteRef.current?.();
   }, [isComplete, text.length]);
+
+  // A click, or Escape, finishes the animation early. Listening on the document
+  // keeps the heading a plain <h1>: a clickable heading is unreachable for
+  // keyboard and screen-reader users.
+  //
+  // Deliberately `click` and not `pointerdown` — pointerdown fires at
+  // touch-start, before scroll intent is known, so the first swipe on a phone
+  // would skip the intro. Escape is the only key, so ⌘K, Tab and Space/PageDown
+  // scrolling all keep working normally.
+  const onInteract = useEvent(() => skip());
+  const onKeyDown = useEvent((e: KeyboardEvent) => {
+    if (e.key === "Escape") skip();
+  });
+
+  useEffect(() => {
+    if (isComplete) return;
+    window.addEventListener("click", onInteract);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("click", onInteract);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isComplete, onInteract, onKeyDown]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -105,7 +134,7 @@ export default function Typewriter({
   const rendered = started ? buildHighlightedSpans(text, visibleText, highlights) : null;
 
   return (
-    <h1 className={className} onClick={skip} style={{ cursor: isComplete ? "default" : "pointer" }}>
+    <h1 className={className}>
       {!started && (
         <span className="typewriter-dots" aria-hidden="true">
           <span className="dot">.</span>
@@ -115,18 +144,16 @@ export default function Typewriter({
       )}
       {rendered}
       {started && cursorVisible && (
-        <span className="typewriter-cursor" aria-hidden="true">|</span>
+        <span className="typewriter-cursor" aria-hidden="true">
+          |
+        </span>
       )}
       <span className="sr-only">{text}</span>
     </h1>
   );
 }
 
-function buildHighlightedSpans(
-  fullText: string,
-  visibleText: string,
-  highlights: string[]
-): React.ReactNode[] {
+function buildHighlightedSpans(fullText: string, visibleText: string, highlights: string[]): React.ReactNode[] {
   const visibleLen = visibleText.length;
 
   // Find highlight ranges within the visible portion
@@ -151,13 +178,13 @@ function buildHighlightedSpans(
 
   const nodes: React.ReactNode[] = [];
   let pos = 0;
-  for (let i = 0; i < ranges.length; i++) {
-    const r = ranges[i];
+  for (const r of ranges) {
     if (r.start > pos) {
-      nodes.push(<span key={`p${i}`}>{visibleText.slice(pos, r.start)}</span>);
+      // Keyed by character offset — a stable identity even as text streams in.
+      nodes.push(<span key={`p${r.start}-${r.end}`}>{visibleText.slice(pos, r.start)}</span>);
     }
     nodes.push(
-      <span key={`h${i}`} className="typewriter-highlight">
+      <span key={`h${r.start}-${r.end}`} className="typewriter-highlight">
         {visibleText.slice(r.start, r.end)}
       </span>
     );

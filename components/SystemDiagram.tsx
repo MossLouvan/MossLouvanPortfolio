@@ -81,7 +81,13 @@ export default function SystemDiagram({
     return (
       <div className={wrapClass}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="sysdiagram-img" src={imageSrc} alt={imageAlt ?? "Architecture diagram"} />
+        <img
+          className="sysdiagram-img"
+          src={imageSrc}
+          alt={imageAlt ?? "Architecture diagram"}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     );
   }
@@ -171,7 +177,7 @@ export default function SystemDiagram({
         </defs>
 
         {/* edges */}
-        {edges.map((e, idx) => {
+        {edges.map((e) => {
           const a = base.get(e.from) ? posOf(e.from) : null;
           const b = base.get(e.to) ? posOf(e.to) : null;
           if (!a || !b) return null;
@@ -182,7 +188,7 @@ export default function SystemDiagram({
           const dy = (by - ay) / 2;
           return (
             <path
-              key={idx}
+              key={`${e.from}->${e.to}`}
               d={`M ${ax} ${ay} C ${ax} ${ay + dy}, ${bx} ${by - dy}, ${bx} ${by}`}
               fill="none"
               stroke="var(--diagram-stroke)"

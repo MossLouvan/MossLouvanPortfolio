@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 type TimelineEntry = {
   date: string;
@@ -15,7 +15,7 @@ type TimelineEntry = {
 const ENTRIES: TimelineEntry[] = [
   {
     date: "Oct 2023 – Aug 2024",
-    logo: "/logos/nasa.png",
+    logo: "/logos/nasa.webp",
     logoAlt: "NASA logo",
     title: "Simulation Developer",
     org: "NASA · App Development Challenge Winner",
@@ -27,7 +27,7 @@ const ENTRIES: TimelineEntry[] = [
   },
   {
     date: "Jul 2024 – Aug 2024",
-    logo: "/logos/principal.png",
+    logo: "/logos/principal.webp",
     logoAlt: "Principal Financial Group logo",
     title: "Contracted AI Software Engineer",
     org: "Principal Financial Group · Contract",
@@ -41,7 +41,7 @@ const ENTRIES: TimelineEntry[] = [
   },
   {
     date: "Apr 2026 – Present",
-    logo: "/logos/iowa-state.png",
+    logo: "/logos/iowa-state.webp",
     logoAlt: "Iowa State University logo",
     title: "Software Engineering LC Peer Mentor",
     org: "Iowa State University · College of Engineering · Part-time",
@@ -53,7 +53,7 @@ const ENTRIES: TimelineEntry[] = [
   },
   {
     date: "May 2026 – Present",
-    logo: "/logos/john-deere.png",
+    logo: "/logos/john-deere.webp",
     logoAlt: "John Deere logo",
     title: "Software Engineer (Intern)",
     org: "John Deere · Internship",
@@ -69,7 +69,7 @@ const ENTRIES: TimelineEntry[] = [
 export default function ExperienceTimeline() {
   return (
     <div className="timeline">
-      <motion.div
+      <m.div
         className="timeline-line"
         initial={{ scaleY: 0 }}
         whileInView={{ scaleY: 1 }}
@@ -79,7 +79,7 @@ export default function ExperienceTimeline() {
       />
 
       {ENTRIES.map((entry, i) => (
-        <motion.div
+        <m.div
           key={entry.title}
           className="timeline-entry"
           initial={{ opacity: 0, x: 24 }}
@@ -91,10 +91,10 @@ export default function ExperienceTimeline() {
             ease: "easeOut",
           }}
         >
-          <motion.span
+          <m.span
             className="timeline-dot"
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
+            initial={{ scale: 0.6, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{
               duration: 0.4,
@@ -112,6 +112,10 @@ export default function ExperienceTimeline() {
               src={entry.logo}
               alt={entry.logoAlt}
               className="timeline-logo"
+              width={56}
+              height={56}
+              loading="lazy"
+              decoding="async"
             />
             <div className="timeline-card-heading">
               <h3>{entry.title}</h3>
@@ -121,11 +125,11 @@ export default function ExperienceTimeline() {
           </div>
 
           <ul className="card-list">
-            {entry.bullets.map((b, j) => (
-              <li key={j}>{b}</li>
+            {entry.bullets.map((b) => (
+              <li key={b}>{b}</li>
             ))}
           </ul>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { usePlatform } from "@/lib/usePlatform";
 
 export type CommandItem = {
@@ -32,16 +32,40 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     if (!q) return commands.filter((c) => c.suggested);
 
     return commands.filter((c) => {
-      const hay = [c.label, c.group ?? "", c.meta ?? "", ...(c.keywords ?? []), c.href ?? ""]
-        .join(" ")
-        .toLowerCase();
+      const hay = [c.label, c.group ?? "", c.meta ?? "", ...(c.keywords ?? []), c.href ?? ""].join(" ").toLowerCase();
       return hay.includes(q);
     });
   }, [commands, query]);
 
+  // Position of each item within `filtered`, so the render below doesn't do a
+  // findIndex per row (that made selection O(n²) in the number of results).
+  const indexById = useMemo(() => {
+    const map = new Map<string, number>();
+    filtered.forEach((c, i) => map.set(c.id, i));
+    return map;
+  }, [filtered]);
+
+  // Clamped during render rather than corrected in an effect, so a shrinking
+  // result list never paints one frame with an out-of-range selection.
+  const activeIndex = Math.max(0, Math.min(active, filtered.length - 1));
+
   const run = (item: CommandItem) => {
     if (item.action) item.action();
-    if (item.href) window.open(item.href, item.href.startsWith("#") ? "_self" : "_blank");
+    if (item.href) {
+      if (item.href.startsWith("#")) {
+        // Not `location.hash = …`: that setter is a no-op when the fragment is
+        // already the current one, so picking two results in the same section
+        // (or the same result twice) would close the palette without moving.
+        // getElementById rather than querySelector — it takes a plain id, so a
+        // malformed href can't throw a SyntaxError.
+        document.getElementById(item.href.slice(1))?.scrollIntoView({ block: "start" });
+        window.history.replaceState(null, "", item.href);
+      } else {
+        // 'noopener' keeps the opened page from reaching back through
+        // window.opener and redirecting this tab.
+        window.open(item.href, "_blank", "noopener,noreferrer");
+      }
+    }
     setOpen(false);
   };
 
@@ -60,23 +84,26 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
       if (!open) return;
 
       if (e.key === "Escape") setOpen(false);
+      // Step from the *clamped* index. `active` itself can sit past the end of
+      // a freshly-filtered list, and decrementing that stale value would leave
+      // the highlight stuck until the user pressed ArrowUp enough times.
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActive((a) => Math.min(a + 1, filtered.length - 1));
+        setActive(Math.min(activeIndex + 1, filtered.length - 1));
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActive((a) => Math.max(0, a - 1));
+        setActive(Math.max(0, activeIndex - 1));
       }
       if (e.key === "Enter") {
-        const item = filtered[Math.min(active, filtered.length - 1)];
+        const item = filtered[activeIndex];
         if (item) run(item);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, active, filtered]);
+  }, [open, activeIndex, filtered]);
 
   // click outside closes (scroll does not)
   useEffect(() => {
@@ -98,11 +125,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     return () => window.clearTimeout(t);
   }, [open]);
 
-  // keep active index in range
-  useEffect(() => {
-    setActive((a) => Math.max(0, Math.min(a, Math.max(0, filtered.length - 1))));
-  }, [filtered.length]);
-
   const grouped = useMemo(() => {
     const out = new Map<string, CommandItem[]>();
     for (const c of filtered) {
@@ -115,18 +137,22 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
 
   return (
     <div ref={rootRef} className="cp-root" data-open={open ? "true" : "false"}>
-      <motion.button
+      {/* Width is animated by a CSS transition keyed off .cp-root[data-open]
+          (see globals.css). Framer's `layout` would animate it with scaleX,
+          which visibly squashes the search icon and the border radius; an
+          `animate={{ width }}` prop would tick a layout property from JS every
+          frame. CSS does it natively with neither problem. */}
+      <button
         type="button"
         className="cp-trigger"
         onClick={() => setOpen((v) => !v)}
-        animate={{ width: open ? 340 : 184 }}
-        transition={{ type: "spring", stiffness: 420, damping: 34 }}
         aria-label="Open search"
+        aria-expanded={open}
       >
         <SearchIcon className="cp-icon" />
         <AnimatePresence initial={false}>
           {!open ? (
-            <motion.div
+            <m.div
               key="closed"
               className="cp-trigger-inner"
               initial={{ opacity: 0 }}
@@ -136,9 +162,9 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
             >
               <span className="cp-placeholder">Search</span>
               <span className="cp-kbd">{isApple ? "⌘K" : "Ctrl K"}</span>
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div
+            <m.div
               key="open"
               className="cp-input-wrap"
               initial={{ opacity: 0 }}
@@ -157,14 +183,14 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 autoFocus
               />
               <span className="cp-kbd">esc</span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.button>
+      </button>
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             className="cp-panel"
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 10 }}
@@ -180,8 +206,8 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                   <div key={group} className="cp-group">
                     <div className="cp-group-title">{group}</div>
                     {items.map((item) => {
-                      const idx = filtered.findIndex((x) => x.id === item.id);
-                      const isActive = idx === active;
+                      const idx = indexById.get(item.id) ?? 0;
+                      const isActive = idx === activeIndex;
                       return (
                         <button
                           key={item.id}
@@ -201,7 +227,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { m, useInView } from "framer-motion";
 import { SKILL_CATEGORIES, type Skill } from "@/data/skills";
 
 function monogramText(name: string): string {
@@ -13,7 +13,7 @@ function monogramText(name: string): string {
 
 function SkillTile({ skill, index, inView }: { skill: Skill; index: number; inView: boolean }) {
   return (
-    <motion.div
+    <m.div
       className="skill-tile"
       initial={{ opacity: 0, y: 12, scale: 0.95 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 12, scale: 0.95 }}
@@ -24,7 +24,7 @@ function SkillTile({ skill, index, inView }: { skill: Skill; index: number; inVi
           <span className="skill-monogram">{skill.mono ?? monogramText(skill.name)}</span>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/logos/skills/${skill.slug}.svg`} alt={`${skill.name} logo`} loading="lazy" />
+          <img src={`/logos/skills/${skill.slug}.svg`} alt={`${skill.name} logo`} loading="lazy" decoding="async" />
         )}
       </div>
       <span className="skill-name">{skill.name}</span>
@@ -33,7 +33,7 @@ function SkillTile({ skill, index, inView }: { skill: Skill; index: number; inVi
           {skill.usedAt}
         </span>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -44,10 +44,7 @@ export default function SkillsGrid() {
   return (
     <div ref={ref} className="skills-grid">
       {SKILL_CATEGORIES.map((cat) => (
-        <div
-          key={cat.title}
-          className={`skills-category${cat.featured ? " skills-category--core" : ""}`}
-        >
+        <div key={cat.title} className={`skills-category${cat.featured ? " skills-category--core" : ""}`}>
           <h3 className="skills-title">{cat.title}</h3>
           <div className="skill-tiles">
             {cat.skills.map((skill, i) => (

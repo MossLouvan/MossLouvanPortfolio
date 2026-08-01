@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch makes the in-flight run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Pinned here rather than in .nvmrc: Cloudflare Pages reads .nvmrc to
+          # pick its build-image Node version, so that file changes deployment
+          # behavior as a side effect. CI pins its own.
+          node-version: "22"
+          cache: npm
+
+      # `ci` over `install` so the lockfile is authoritative — this is what
+      # caught @cloudflare/next-on-pages pinning Next to a version with a
+      # critical RCE.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Pinned here rather than in .nvmrc: Cloudflare Pages reads .nvmrc to
+          # pick its build-image Node version, so that file changes deployment
+          # behavior as a side effect. CI pins its own.
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reports, does not gate. `next` is currently pinned to 15.5.2 by
+      # @cloudflare/next-on-pages (peer: <=15.5.2), and 15.5.2 carries a
+      # critical advisory — CVE-2025-55182, RCE. It cannot be fixed from this
+      # repo: the Cloudflare build command is `npx @cloudflare/next-on-pages@1`,
+      # so the adapter must stay installed, and it caps Next there.
+      #
+      # Blocking on a known-unfixable finding would leave this permanently red
+      # and train people to ignore it, so it runs informationally until the
+      # migration to @opennextjs/cloudflare lands. Re-enable gating then by
+      # dropping continue-on-error.
+      - name: Audit production dependencies (informational)
+        continue-on-error: true
+        run: npm audit --omit=dev
