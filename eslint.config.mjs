@@ -33,8 +33,10 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // Override default ignores of eslint-config-next.
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  // Override default ignores of eslint-config-next. `.vercel` holds the bundle
+  // emitted by `npx @cloudflare/next-on-pages` (the Cloudflare build command);
+  // linting generated output produces thousands of meaningless errors.
+  globalIgnores([".next/**", "out/**", "build/**", ".vercel/**", ".open-next/**", "next-env.d.ts"]),
 ]);
 
 export default eslintConfig;

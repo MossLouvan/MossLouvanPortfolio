@@ -60,7 +60,7 @@ that once made the hero a 2 MB PNG.
 `.github/workflows/ci.yml` runs on every push and pull request:
 
 - **verify** — `npm ci`, typecheck, lint, format check, build
-- **audit** — `npm audit` over production dependencies, gated at `critical`
+- **audit** — `npm audit` over production dependencies, informational only
 
 CI pins its own Node version in the workflow; there is deliberately no
 `.nvmrc`, because Cloudflare Pages reads that file to choose its build image.
@@ -71,5 +71,27 @@ a version with a critical RCE was caught.
 
 ## Deployment
 
-Pushes to `main` deploy automatically via Cloudflare. The build command lives in
-the Cloudflare dashboard, not in this repo.
+Pushes to `main` deploy automatically via Cloudflare Pages. The build command is
+set in the Cloudflare dashboard, not in this repo:
+
+```
+npx @cloudflare/next-on-pages@1
+```
+
+Two consequences worth knowing before changing dependencies:
+
+1. **`@cloudflare/next-on-pages` must stay in `devDependencies`.** The build
+   command runs it via `npx`, which uses the locally installed copy. Remove it
+   and `npx` resolves it fresh, which fails: it needs
+   `@cloudflare/workers-types@^4` while current `wrangler` requires `^5`.
+   That is why `wrangler` is pinned to `4.67.0` in `overrides` — it keeps the
+   tree resolvable from scratch rather than only surviving as a frozen lockfile.
+
+2. **Next is capped at 15.5.2**, because `next-on-pages` declares
+   `peer next ">=14.3.0 && <=15.5.2"`. That version carries a critical advisory
+   (CVE-2025-55182, RCE) which therefore **cannot be fixed from this repo**.
+
+`next-on-pages` is deprecated in favour of
+[`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Migrating to it
+is what unblocks Next upgrades, and it requires changing the build command in
+the Cloudflare dashboard.

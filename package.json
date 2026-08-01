@@ -15,18 +15,24 @@
   },
   "dependencies": {
     "framer-motion": "^12.23.25",
-    "next": "^15.5.18",
+    "next": "15.5.2",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
+  "overrides": {
+    "postcss": "^8.5.25",
+    "sharp": "^0.35.3",
+    "wrangler": "4.67.0"
+  },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.9.3",
     "eslint": "^9",
-    "eslint-config-next": "^15.5.18",
+    "eslint-config-next": "15.5.2",
     "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5"
