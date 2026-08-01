@@ -1,14 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import type { CaseStudy } from "@/data/caseStudies";
 import SystemDiagram from "@/components/SystemDiagram";
 import LinkIcon from "@/components/LinkIcon";
+import { useEvent } from "@/lib/useEvent";
 
 type Tab = "architecture" | "overview" | "impact";
 
+/**
+ * Wrapper that gives the drawer a fresh identity per study, so React resets the
+ * selected tab on open instead of an effect clearing it a frame late.
+ */
 export default function CaseStudyDrawer({
+  open,
+  onClose,
+  study,
+}: {
+  open: boolean;
+  onClose: () => void;
+  study: CaseStudy | null;
+}) {
+  return <CaseStudyDrawerPanel key={open ? study?.slug : "closed"} open={open} onClose={onClose} study={study} />;
+}
+
+function CaseStudyDrawerPanel({
   open,
   onClose,
   study,
@@ -20,14 +37,14 @@ export default function CaseStudyDrawer({
   // Architecture is shown first by default.
   const [tab, setTab] = useState<Tab>("architecture");
 
-  useEffect(() => {
-    if (open) setTab("architecture");
-  }, [open, study?.slug]);
+  // Stable identity, so the effect binds once per open rather than
+  // re-subscribing whenever the parent hands down a new onClose.
+  const handleClose = useEvent(() => onClose());
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     };
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -36,12 +53,12 @@ export default function CaseStudyDrawer({
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose]);
+  }, [open, handleClose]);
 
   return (
     <AnimatePresence>
       {open && study && (
-        <motion.div
+        <m.div
           className="csd-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -51,7 +68,7 @@ export default function CaseStudyDrawer({
           aria-modal="true"
           aria-label="Case study drawer"
         >
-          <motion.aside
+          <m.aside
             className="csd-panel"
             initial={{ x: 420, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -67,25 +84,28 @@ export default function CaseStudyDrawer({
                   {study.timeframe ? ` · ${study.timeframe}` : ""}
                 </div>
               </div>
-              <button className="csd-close" onClick={onClose} aria-label="Close drawer">
+              <button type="button" className="csd-close" onClick={onClose} aria-label="Close drawer">
                 ✕
               </button>
             </div>
 
             <div className="csd-tabs">
               <button
+                type="button"
                 className={`csd-tab ${tab === "architecture" ? "active" : ""}`}
                 onClick={() => setTab("architecture")}
               >
                 Architecture
               </button>
               <button
+                type="button"
                 className={`csd-tab ${tab === "overview" ? "active" : ""}`}
                 onClick={() => setTab("overview")}
               >
                 Overview
               </button>
               <button
+                type="button"
                 className={`csd-tab ${tab === "impact" ? "active" : ""}`}
                 onClick={() => setTab("impact")}
               >
@@ -100,7 +120,7 @@ export default function CaseStudyDrawer({
                   {study.flow && (
                     <ol className="project-flow csd-flow">
                       {study.flow.map((step, i) => (
-                        <li key={i} className="project-flow-step">
+                        <li key={step} className="project-flow-step">
                           <span className="project-flow-num">{i + 1}</span>
                           <span className="project-flow-text">{step}</span>
                         </li>
@@ -178,8 +198,8 @@ export default function CaseStudyDrawer({
                 </div>
               )}
             </div>
-          </motion.aside>
-        </motion.div>
+          </m.aside>
+        </m.div>
       )}
     </AnimatePresence>
   );

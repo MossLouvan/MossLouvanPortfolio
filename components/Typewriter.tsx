@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useEvent } from "@/lib/useEvent";
 
 interface TypewriterProps {
   text: string;
@@ -30,7 +31,12 @@ export default function Typewriter({
   const [cursorVisible, setCursorVisible] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+
+  // Written in an effect, not during render: React may replay or discard a
+  // render, and a mutation from discarded work would leak.
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const skip = useCallback(() => {
     if (isComplete) return;
@@ -40,6 +46,21 @@ export default function Typewriter({
     setIsComplete(true);
     onCompleteRef.current?.();
   }, [isComplete, text.length]);
+
+  // Any click or key press finishes the animation early. Listening on the
+  // document keeps the heading a plain <h1> — a clickable heading is
+  // unreachable for keyboard and screen-reader users.
+  const onInteract = useEvent(() => skip());
+
+  useEffect(() => {
+    if (isComplete) return;
+    window.addEventListener("pointerdown", onInteract);
+    window.addEventListener("keydown", onInteract);
+    return () => {
+      window.removeEventListener("pointerdown", onInteract);
+      window.removeEventListener("keydown", onInteract);
+    };
+  }, [isComplete, onInteract]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -105,7 +126,7 @@ export default function Typewriter({
   const rendered = started ? buildHighlightedSpans(text, visibleText, highlights) : null;
 
   return (
-    <h1 className={className} onClick={skip} style={{ cursor: isComplete ? "default" : "pointer" }}>
+    <h1 className={className}>
       {!started && (
         <span className="typewriter-dots" aria-hidden="true">
           <span className="dot">.</span>
@@ -151,13 +172,14 @@ function buildHighlightedSpans(
 
   const nodes: React.ReactNode[] = [];
   let pos = 0;
-  for (let i = 0; i < ranges.length; i++) {
-    const r = ranges[i];
+  for (const r of ranges) {
+
     if (r.start > pos) {
-      nodes.push(<span key={`p${i}`}>{visibleText.slice(pos, r.start)}</span>);
+      // Keyed by character offset — a stable identity even as text streams in.
+      nodes.push(<span key={`p${r.start}`}>{visibleText.slice(pos, r.start)}</span>);
     }
     nodes.push(
-      <span key={`h${i}`} className="typewriter-highlight">
+      <span key={`h${r.start}`} className="typewriter-highlight">
         {visibleText.slice(r.start, r.end)}
       </span>
     );

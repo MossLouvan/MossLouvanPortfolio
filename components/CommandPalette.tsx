@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { usePlatform } from "@/lib/usePlatform";
 
 export type CommandItem = {
@@ -39,9 +39,29 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     });
   }, [commands, query]);
 
+  // Position of each item within `filtered`, so the render below doesn't do a
+  // findIndex per row (that made selection O(n²) in the number of results).
+  const indexById = useMemo(() => {
+    const map = new Map<string, number>();
+    filtered.forEach((c, i) => map.set(c.id, i));
+    return map;
+  }, [filtered]);
+
+  // Clamped during render rather than corrected in an effect, so a shrinking
+  // result list never paints one frame with an out-of-range selection.
+  const activeIndex = Math.max(0, Math.min(active, filtered.length - 1));
+
   const run = (item: CommandItem) => {
     if (item.action) item.action();
-    if (item.href) window.open(item.href, item.href.startsWith("#") ? "_self" : "_blank");
+    if (item.href) {
+      if (item.href.startsWith("#")) {
+        window.location.hash = item.href;
+      } else {
+        // 'noopener' keeps the opened page from reaching back through
+        // window.opener and redirecting this tab.
+        window.open(item.href, "_blank", "noopener,noreferrer");
+      }
+    }
     setOpen(false);
   };
 
@@ -69,14 +89,14 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
         setActive((a) => Math.max(0, a - 1));
       }
       if (e.key === "Enter") {
-        const item = filtered[Math.min(active, filtered.length - 1)];
+        const item = filtered[activeIndex];
         if (item) run(item);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, active, filtered]);
+  }, [open, activeIndex, filtered]);
 
   // click outside closes (scroll does not)
   useEffect(() => {
@@ -98,11 +118,6 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
     return () => window.clearTimeout(t);
   }, [open]);
 
-  // keep active index in range
-  useEffect(() => {
-    setActive((a) => Math.max(0, Math.min(a, Math.max(0, filtered.length - 1))));
-  }, [filtered.length]);
-
   const grouped = useMemo(() => {
     const out = new Map<string, CommandItem[]>();
     for (const c of filtered) {
@@ -115,18 +130,24 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
 
   return (
     <div ref={rootRef} className="cp-root" data-open={open ? "true" : "false"}>
-      <motion.button
+      <m.button
+        layout
         type="button"
         className="cp-trigger"
         onClick={() => setOpen((v) => !v)}
-        animate={{ width: open ? 340 : 184 }}
+        // `layout` + a plain style width: Framer animates the size change with
+        // transforms instead of ticking the `width` property, which would force
+        // a layout pass on the whole header every frame.
+        style={{ width: open ? 340 : 184 }}
         transition={{ type: "spring", stiffness: 420, damping: 34 }}
         aria-label="Open search"
+        aria-expanded={open}
       >
         <SearchIcon className="cp-icon" />
         <AnimatePresence initial={false}>
           {!open ? (
-            <motion.div
+            <m.div
+              layout
               key="closed"
               className="cp-trigger-inner"
               initial={{ opacity: 0 }}
@@ -136,9 +157,10 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
             >
               <span className="cp-placeholder">Search</span>
               <span className="cp-kbd">{isApple ? "⌘K" : "Ctrl K"}</span>
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div
+            <m.div
+              layout
               key="open"
               className="cp-input-wrap"
               initial={{ opacity: 0 }}
@@ -157,14 +179,14 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 autoFocus
               />
               <span className="cp-kbd">esc</span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             className="cp-panel"
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 10 }}
@@ -180,8 +202,8 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                   <div key={group} className="cp-group">
                     <div className="cp-group-title">{group}</div>
                     {items.map((item) => {
-                      const idx = filtered.findIndex((x) => x.id === item.id);
-                      const isActive = idx === active;
+                      const idx = indexById.get(item.id) ?? 0;
+                      const isActive = idx === activeIndex;
                       return (
                         <button
                           key={item.id}
@@ -201,7 +223,7 @@ export default function CommandPalette({ commands }: { commands: CommandItem[] }
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

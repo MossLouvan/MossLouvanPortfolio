@@ -1,8 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m } from "framer-motion";
 
+/**
+ * Section wrapper with a collapsible body.
+ *
+ * The open/close transition is pure CSS (`grid-template-rows: 0fr → 1fr`)
+ * rather than an animated `height`. The browser interpolates it natively, so
+ * there is no per-frame JavaScript and no React re-render while it plays —
+ * which matters because these sections wrap image grids and a 3D carousel.
+ *
+ * The body also stays mounted when collapsed, so in-page search and anchor
+ * links still reach it. `inert` keeps it out of the tab order while hidden.
+ */
 export default function CollapsibleSection({
   title,
   children,
@@ -17,7 +28,7 @@ export default function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <motion.div
+    <m.section
       id={id}
       className="collapsible-section"
       initial={{ opacity: 0, y: 20 }}
@@ -25,44 +36,28 @@ export default function CollapsibleSection({
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <motion.div
+      <button
+        type="button"
         className="section-header"
-        onClick={() => setOpen(!open)}
-        whileHover={{ opacity: 0.8 }}
-        transition={{ duration: 0.15 }}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
       >
         <h2 className="section-title">{title}</h2>
-        <motion.span
+        <m.span
           className="section-toggle"
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
+          aria-hidden
         >
           ▼
-        </motion.span>
-      </motion.div>
+        </m.span>
+      </button>
 
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="content"
-            className="section-content open"
-            initial={{ opacity: 0, height: 0, y: -8 }}
-            animate={{ opacity: 1, height: "auto", y: 0 }}
-            exit={{ opacity: 0, height: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
-            style={{ overflow: "hidden" }}
-          >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, delay: open ? 0.1 : 0 }}
-            >
-              {children}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      <div className="section-collapse" data-open={open ? "true" : "false"}>
+        <div className="section-content" inert={!open}>
+          {children}
+        </div>
+      </div>
+    </m.section>
   );
 }

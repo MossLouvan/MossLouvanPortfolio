@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 type DocWithVT = Document & {
   startViewTransition?: (callback: () => void) => { ready: Promise<void> };
@@ -69,7 +69,7 @@ export default function ThemeToggle() {
   };
 
   return (
-    <motion.button
+    <m.button
       type="button"
       className="theme-toggle"
       data-theme={isDark ? "dark" : "light"}
@@ -118,6 +118,6 @@ export default function ThemeToggle() {
           <line x1="17.8" y1="6.2" x2="19.9" y2="4.1" />
         </g>
       </svg>
-    </motion.button>
+    </m.button>
   );
 }

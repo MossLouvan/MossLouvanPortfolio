@@ -667,7 +667,41 @@ html:not(.dark) .typewriter-highlight {
   background: transparent;
 }
 
+/* Collapse driven by grid-template-rows so the browser interpolates it
+   natively — no JS ticking `height` and no React render per frame. */
+.section-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.35s ease,
+    opacity 0.25s ease;
+  opacity: 0;
+}
+
+.section-collapse[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.section-content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-collapse {
+    transition: none;
+  }
+}
+
 .section-header {
+  /* It is a <button> so keyboard users can toggle it; strip the UA chrome
+     so it still reads as a plain section heading row. */
+  width: 100%;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
   padding: 0;
   cursor: pointer;
   display: flex;

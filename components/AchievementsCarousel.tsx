@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { ACHIEVEMENT_CAPTIONS } from "@/data/achievementCaptions";
+import { useEvent } from "@/lib/useEvent";
 
 type Props = {
-  images: string[];
+  images: readonly string[];
   lightboxOpen: boolean;
   activeIndex: number;
   onOpen: (index: number) => void;
@@ -55,17 +56,19 @@ export default function AchievementsCarousel({
   const next = useCallback(() => go(active + 1), [active, go]);
   const prev = useCallback(() => go(active - 1), [active, go]);
 
-  // Lightbox keyboard nav
+  // Stable handler, so the listener binds once per open/close instead of
+  // re-subscribing every time the parent hands down new callback identities.
+  const onLightboxKey = useEvent((e: KeyboardEvent) => {
+    if (e.key === "Escape") onClose();
+    if (e.key === "ArrowRight") onNext();
+    if (e.key === "ArrowLeft") onPrev();
+  });
+
   useEffect(() => {
     if (!lightboxOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") onNext();
-      if (e.key === "ArrowLeft") onPrev();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [lightboxOpen, onClose, onNext, onPrev]);
+    window.addEventListener("keydown", onLightboxKey);
+    return () => window.removeEventListener("keydown", onLightboxKey);
+  }, [lightboxOpen, onLightboxKey]);
 
   if (images.length === 0) {
     return (
@@ -113,7 +116,7 @@ export default function AchievementsCarousel({
             const caption = captionFor(src);
             const isActive = offset === 0;
             return (
-              <motion.div
+              <m.div
                 key={src}
                 className="ach-card-3d"
                 data-hidden={hidden ? "true" : "false"}
@@ -136,9 +139,15 @@ export default function AchievementsCarousel({
                   tabIndex={hidden ? -1 : 0}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={caption} draggable={false} />
+                  <img
+                    src={src}
+                    alt={caption}
+                    draggable={false}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </button>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
@@ -146,7 +155,7 @@ export default function AchievementsCarousel({
         {/* fixed-height wrapper so the controls below never shift between captions */}
         <div className="ach-coverflow-caption">
           <AnimatePresence mode="wait">
-            <motion.p
+            <m.p
               key={active}
               className="ach-coverflow-caption-text"
               initial={{ opacity: 0, y: 6 }}
@@ -155,18 +164,19 @@ export default function AchievementsCarousel({
               transition={{ duration: reduce ? 0 : 0.2 }}
             >
               {activeCaption}
-            </motion.p>
+            </m.p>
           </AnimatePresence>
         </div>
 
         <div className="ach-controls">
-          <button className="ach-nav" onClick={prev} aria-label="Previous">
+          <button type="button" className="ach-nav" onClick={prev} aria-label="Previous">
             ‹
           </button>
           <div className="ach-dots" role="tablist">
-            {images.map((_, i) => (
+            {images.map((src, i) => (
               <button
-                key={i}
+                key={src}
+                type="button"
                 className={`ach-dot ${i === active ? "active" : ""}`}
                 onClick={() => go(i)}
                 aria-label={`Go to image ${i + 1}`}
@@ -175,7 +185,7 @@ export default function AchievementsCarousel({
               />
             ))}
           </div>
-          <button className="ach-nav" onClick={next} aria-label="Next">
+          <button type="button" className="ach-nav" onClick={next} aria-label="Next">
             ›
           </button>
         </div>
@@ -183,7 +193,7 @@ export default function AchievementsCarousel({
 
       <AnimatePresence>
         {lightboxOpen && images[safeLightboxIndex] && (
-          <motion.div
+          <m.div
             className="lightbox-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -193,7 +203,7 @@ export default function AchievementsCarousel({
             aria-modal="true"
             aria-label="Image viewer"
           >
-            <motion.div
+            <m.div
               className="lightbox-content"
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -201,22 +211,27 @@ export default function AchievementsCarousel({
               transition={{ duration: 0.18 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className="lightbox-close" onClick={onClose} aria-label="Close">
+              <button type="button" className="lightbox-close" onClick={onClose} aria-label="Close">
                 ✕
               </button>
-              <button className="lightbox-nav left" onClick={onPrev} aria-label="Previous image">
+              <button type="button" className="lightbox-nav left" onClick={onPrev} aria-label="Previous image">
                 ‹
               </button>
-              <button className="lightbox-nav right" onClick={onNext} aria-label="Next image">
+              <button type="button" className="lightbox-nav right" onClick={onNext} aria-label="Next image">
                 ›
               </button>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="lightbox-img" src={images[safeLightboxIndex]} alt={lightboxCaption} />
+              <img
+                className="lightbox-img"
+                src={images[safeLightboxIndex]}
+                alt={lightboxCaption}
+                decoding="async"
+              />
               <div className="lightbox-caption">
                 <div className="lightbox-text">{lightboxCaption}</div>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>
