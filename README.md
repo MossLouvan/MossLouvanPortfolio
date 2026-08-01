@@ -62,6 +62,9 @@ that once made the hero a 2 MB PNG.
 - **verify** — `npm ci`, typecheck, lint, format check, build
 - **audit** — `npm audit` over production dependencies, gated at `critical`
 
+CI pins its own Node version in the workflow; there is deliberately no
+`.nvmrc`, because Cloudflare Pages reads that file to choose its build image.
+
 `npm ci` is deliberate: it treats the lockfile as authoritative and fails on
 peer-dependency conflicts, which is how a build-time dependency pinning Next to
 a version with a critical RCE was caught.

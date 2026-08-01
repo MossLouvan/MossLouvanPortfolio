@@ -21,7 +21,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          # Pinned here rather than in .nvmrc: Cloudflare Pages reads .nvmrc to
+          # pick its build-image Node version, so that file changes deployment
+          # behavior as a side effect. CI pins its own.
+          node-version: "22"
           cache: npm
 
       # `ci` over `install` so the lockfile is authoritative — this is what
@@ -52,7 +55,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          # Pinned here rather than in .nvmrc: Cloudflare Pages reads .nvmrc to
+          # pick its build-image Node version, so that file changes deployment
+          # behavior as a side effect. CI pins its own.
+          node-version: "22"
           cache: npm
 
       - name: Install dependencies

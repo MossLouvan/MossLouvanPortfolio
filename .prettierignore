@@ -7,4 +7,3 @@ docs/
 .claude/
 package-lock.json
 next-env.d.ts
-.nvmrc
