@@ -99,7 +99,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         "Won nationally against a large field of participating teams",
         "Created a polished demo experience for presentations and judging",
         "Strengthened public speaking + technical communication through talks and showcases",
-        "Lit the path for the future showing how people coming from low income areas can win national competitions and work with NASA",
+        "Showed that students from low-income areas can win national competitions and work with NASA",
       ],
     },
   },
@@ -126,7 +126,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         "Built end-to-end platform (ingest → retrieve → answer → highlight evidence)",
         "Designed for traceability and stakeholder trust by keeping the human in the loop",
         "Presented to senior engineers/executives (including CEO visibility)",
-        "Reduced reliance on third party vendors costing 500k+/year",
+        "Reduced reliance on third-party vendors costing $500k+/year",
       ],
     },
     architecture: {

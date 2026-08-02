@@ -10,6 +10,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege, stated in the file rather than relying on the repo-wide
+# default staying "read".
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Typecheck, lint, build

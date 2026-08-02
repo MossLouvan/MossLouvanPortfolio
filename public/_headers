@@ -1,0 +1,21 @@
+# Security headers, applied at the Cloudflare edge.
+# Cloudflare Pages reads this file from the build output; next-on-pages copies
+# public/ through and appends its own cache rules below whatever is here.
+#
+# CSP notes:
+#   script-src needs 'unsafe-inline' — Next's App Router emits ~7 inline
+#   hydration scripts (self.__next_f.push(...)) whose contents change with every
+#   build, so hashes are impractical, and a static export has no server to issue
+#   per-request nonces. 'self' still blocks loading scripts from other origins,
+#   and connect-src 'self' still blocks exfiltration, which is the real
+#   defence-in-depth value here (a compromised npm package phoning home).
+#
+#   static.cloudflareinsights.com is allowed so that turning on Cloudflare Web
+#   Analytics later does not get silently blocked.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=()
