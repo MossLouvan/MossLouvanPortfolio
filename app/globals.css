@@ -1807,6 +1807,19 @@ html:not(.dark) .typewriter-highlight {
     order: 3;
     width: 100%;
     margin-top: 1rem;
+    /* Six links do not fit at ~390px: "Leadership" clipped and "Skills" sat
+       off-screen with no way to reach them. Scroll the row instead. */
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-nav a {
+    white-space: nowrap;
   }
 
   .hero-banner {

@@ -17,7 +17,14 @@ type Props = {
 
 function captionFor(src: string): string {
   const filename = decodeURIComponent(src.split("/").pop() || "");
-  return ACHIEVEMENT_CAPTIONS[filename] ?? "Achievement photo.";
+  // hasOwnProperty, not a bare index: a filename of "constructor" or "toString"
+  // would otherwise resolve off Object.prototype and return a function, which
+  // `??` does not catch and React throws on rendering. Not reachable while the
+  // image list is a static constant, but it stops being safe the moment that
+  // list becomes dynamic.
+  return Object.prototype.hasOwnProperty.call(ACHIEVEMENT_CAPTIONS, filename)
+    ? ACHIEVEMENT_CAPTIONS[filename]
+    : "Achievement photo.";
 }
 
 export default function AchievementsCarousel({

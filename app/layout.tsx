@@ -4,9 +4,32 @@ import type { Metadata, Viewport } from "next";
 import { ReactNode } from "react";
 import MotionProvider from "@/components/MotionProvider";
 
+const SITE_URL = "https://mosslouvan.com";
+const TITLE = "Moss Louvan | Software Engineer";
+const DESCRIPTION = "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.";
+
 export const metadata: Metadata = {
-  title: "Moss Louvan | Software Engineer",
-  description: "Portfolio of Moss Louvan, AI-focused Software Engineer and NASA App Development Challenge winner.",
+  // metadataBase makes the relative OG image below resolve to an absolute URL,
+  // which crawlers require.
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Moss Louvan",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Moss Louvan — Software Engineer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {

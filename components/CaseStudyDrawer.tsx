@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import type { CaseStudy } from "@/data/caseStudies";
 import SystemDiagram from "@/components/SystemDiagram";
@@ -41,17 +41,56 @@ function CaseStudyDrawerPanel({ onClose, study }: { onClose: () => void; study: 
   // re-subscribing whenever the parent hands down a new onClose.
   const handleClose = useEvent(() => onClose());
 
+  const panelRef = useRef<HTMLElement | null>(null);
+
   // The panel only exists while open, so this runs for exactly that lifetime.
+  //
+  // It also traps focus. Without this, Tab walked the page *behind* an
+  // aria-modal dialog and Escape dropped focus to <body>, so keyboard and
+  // screen-reader users never actually entered the drawer and lost their place
+  // on close.
   useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const focusable = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      ).filter((el) => el.offsetParent !== null);
+
+    focusable()[0]?.focus();
+
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
+      if (e.key === "Escape") {
+        handleClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const items = focusable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      // Wrap at both ends, and pull focus back in if it escaped the panel.
+      if (e.shiftKey && (active === first || !panelRef.current?.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !panelRef.current?.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus();
     };
   }, [handleClose]);
 
@@ -67,6 +106,7 @@ function CaseStudyDrawerPanel({ onClose, study }: { onClose: () => void; study: 
       aria-label="Case study drawer"
     >
       <m.aside
+        ref={panelRef}
         className="csd-panel"
         initial={{ x: 420, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
