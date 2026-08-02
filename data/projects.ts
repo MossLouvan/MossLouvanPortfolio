@@ -61,7 +61,7 @@ export const PROJECTS: Project[] = [
     slug: "principal-ai-pdf",
     title: "AI PDF Processing Platform",
     role: "Contracted AI Software Engineer · Principal Financial Group",
-    timeframe: "Jun 2024 – Aug 2024",
+    timeframe: "Jun 2024 – Jul 2024",
     cover: "/projects/principal.webp",
     coverFit: "contain",
     blurb:
