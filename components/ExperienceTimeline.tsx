@@ -26,7 +26,7 @@ const ENTRIES: TimelineEntry[] = [
     ],
   },
   {
-    date: "Jul 2024 – Aug 2024",
+    date: "Jun 2024 – Jul 2024",
     logo: "/logos/principal.webp",
     logoAlt: "Principal Financial Group logo",
     title: "Contracted AI Software Engineer",
