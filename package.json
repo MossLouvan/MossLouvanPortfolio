@@ -22,7 +22,16 @@
   "overrides": {
     "postcss": "^8.5.25",
     "sharp": "^0.35.3",
-    "wrangler": "4.67.0"
+    "wrangler": "4.67.0",
+    "@vercel/fun": {
+      "tar": "^7.5.22"
+    },
+    "@vercel/node": {
+      "path-to-regexp": "^6.3.0"
+    },
+    "@vercel/remix-builder": {
+      "path-to-regexp": "^6.3.0"
+    }
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
